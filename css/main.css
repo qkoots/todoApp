@@ -1,0 +1,60 @@
+.container {
+    padding: 1em 2em;
+    border: 1px solid black;
+    width: 70%;
+    position: relative;
+    min-height: 500px;
+}
+ul {
+    position: relative;
+    padding: 0;
+}
+li {
+
+}
+#listItemsDiv {
+    margin-top: 20px;
+}
+.item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+    margin-bottom: 7px;
+    padding: 20px;
+    box-shadow: 0 3px 3px #d3d3d3;
+}
+.dateSpan {
+
+}
+.buttonsDiv {
+    /*position: absolute;*/
+    /*top: 30px;*/
+    /*right: 30px;*/
+}
+.item p {
+    position: relative;
+    word-wrap: break-word;
+}
+/*#completedListUl {*/
+/*background-color: #58ff62;*/
+/*}*/
+#completedListUl .item {
+    background-color: #f7f7f7;
+    opacity: .6;
+}
+
+#completedListUl p {
+    text-decoration : line-through;
+}
+.test {
+    color:red;
+}
+
+.priority-item {
+    background-color: #ffcb69;
+}
+
+#priorityListBtn {
+    display: none;
+}

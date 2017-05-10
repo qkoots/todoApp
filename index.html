@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--<script src="https://unpkg.com/vue"></script>-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <title>Document</title>
+</head>
+<body>
+
+<div class= fluid-container>
+    <div class="container" id="toDo">
+
+        <h2 class="listTitle">TO-DO</h2>
+        <input type="text" id="userInput" placeholder="Task">
+        <button id="addBtn" class="btn btn-primary">Add to list</button>
+        <button id="priorityListBtn" class="btn btn-secondary">Priorities</button>
+        <input type="text" id="searchInputField" placeholder="Search...">
+
+
+        <div id="listItemsDiv">
+            <ul id="listUl">
+                <!--New tasks goes here-->
+            </ul>
+            <ul id="completedListUl">
+                <!--completed tasks goes here-->
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
