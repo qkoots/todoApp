@@ -6,13 +6,15 @@
 // Add item to task list by pressing enterKey.
 // View option to only see the priority items.
 // Empty input form after items has been added.
-//Display date when task was send to completed list.
+// Display date when task was send to completed list.
+// integrate search method to search for specific items
 
-//TODO integrate search method to search for specific items
+//TODO Search should ignore case-sensitivity
 //TODO Integrate Web Storage API to save data in the browser.
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
+
 
 $(()=>{
 
@@ -297,7 +299,7 @@ $(()=>{
 
         if(itemList.childElementCount > 0){
             for( let i = 0; i < itemList.childElementCount; i++) {
-                let getContent = itemList.children[i].firstElementChild.textContent;
+                let getContent = itemList.children[i].firstElementChild.textContent.toLowerCase();
                 if(!getContent.match(pat)){
                     itemList.children[i].style.display ="none";
                 }else {
@@ -308,7 +310,7 @@ $(()=>{
 
         if(completedItemList.childElementCount > 0){
             for( let i = 0; i < completedItemList.childElementCount; i++) {
-                let getContent = completedItemList.children[i].firstElementChild.textContent;
+                let getContent = completedItemList.children[i].firstElementChild.textContent.toLowerCase();
                 if(!getContent.match(pat)){
                     completedItemList.children[i].style.display ="none";
                 }else {
