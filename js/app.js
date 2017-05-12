@@ -8,8 +8,8 @@
 // Empty input form after items has been added.
 // Display date when task was send to completed list.
 // integrate search method to search for specific items
+// Search should ignore case-sensitivity
 
-//TODO Search should ignore case-sensitivity
 //TODO Integrate Web Storage API to save data in the browser.
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
@@ -53,7 +53,7 @@ $(()=>{
         if(item.getAttribute("data-level")){
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
-            hidePriorityViewToggleBtn();
+            hidePriorityViewToggleBtn(itemList);
         }else {
             priorityItem(item);
         }
@@ -114,13 +114,13 @@ $(()=>{
     };
 
     // This function will hide the priority button that will change view to only show task labeled as priority. (if there is NO task with priority label).
-    const hidePriorityViewToggleBtn = () => {
+    const hidePriorityViewToggleBtn = (list) => {
 
         // counter keeping track of how many items in the list have the data-level attribute
         let count = 0;
 
-        for(let i = 0 ; i < itemList.children.length; i++) {
-            if(itemList.children[i].getAttribute("data-level") !== null){
+        for(let i = 0 ; i < list.children.length; i++) {
+            if(list.children[i].getAttribute("data-level") !== null){
                 count++;
                 priorityListBtn.style.display = "inline-block";
             }else {
@@ -133,11 +133,21 @@ $(()=>{
         }
     };
 
-    // Function that will delete the list item form the items list
+    // Function that will delete the list item form the items list and invoke function checkForPriorityLabeledTask
     const deleteItem = e => {
         let item = e.target.parentNode.parentNode;
         let parent = item.parentNode;
         parent.removeChild(item);
+        checkForPriorityLabeledTask();
+    };
+
+    // Function that will invoked the hidePriorityViewToggleBtn function if one of the lists is > 0 (items);
+    const checkForPriorityLabeledTask = () =>{
+       if(itemList.childElementCount > 0){
+           hidePriorityViewToggleBtn(itemList);
+       }else if(completedItemList.childElementCount > 0){
+           hidePriorityViewToggleBtn(completedItemList);
+       }
     };
 
     // Function that will remove item form the items list and put it on the completed tasks list and invoke hidePriorityBtn function.
@@ -173,7 +183,6 @@ $(()=>{
     };
 
     const getDate = () => {
-
         const date     = new Date();
         const getDate  = date.getUTCDate();
         const getMonth = date.getUTCMonth();
