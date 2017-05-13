@@ -184,54 +184,10 @@ $(()=>{
 
     const getDate = () => {
         const date     = new Date();
-        const getDate  = date.getUTCDate();
-        const getMonth = date.getUTCMonth();
-        const getYear  = date.getUTCFullYear();
-        let month;
-        let fullDate;
-
-        switch(getMonth) {
-            case 0:
-                month = "jan";
-                break;
-            case 1:
-                month = "feb";
-                break;
-            case 2:
-                month = "mar";
-                break;
-            case 3:
-                month = "apr";
-                break;
-            case 4:
-                month = "may";
-                break;
-            case 5:
-                month = "jun";
-                break;
-            case 6:
-                month = "jul";
-                break;
-            case 7:
-                month = "aug";
-                break;
-            case 8:
-                month = "sep";
-                break;
-            case 9:
-                month = "oct";
-                break;
-            case 10:
-                month = "nov";
-                break;
-            case 11:
-                month = "dec";
-                break;
-        }
-
-        fullDate = `${getDate} ${month} ${getYear}`;
-        return fullDate;
+        let getDate  = date.toDateString();
+        return getDate;
     };
+
 
     // Function that will add items to the list. The parameter passed to the function is received from the addBtn event listener.
     let addItem = (text) =>{
