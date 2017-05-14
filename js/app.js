@@ -10,6 +10,7 @@
 // integrate search method to search for specific items
 // Search should ignore case-sensitivity
 
+//TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
 //TODO Integrate Web Storage API to save data in the browser.
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
@@ -190,7 +191,7 @@ $(()=>{
 
 
     // Function that will add items to the list. The parameter passed to the function is received from the addBtn event listener.
-    let addItem = (text) =>{
+    let addItem = (text ,spanTag) =>{
 
         // Creates an li element and set the id attribute
         const item = document.createElement("li");
@@ -204,7 +205,7 @@ $(()=>{
 
         // Creates the Date indicator and appends it to the li element.
         const dateSpan = document.createElement("span");
-        const dateNode = document.createTextNode("Created on: "+ getDate());
+        const dateNode = document.createTextNode("Created on: "+ getDate() || spanTag);
         dateSpan.appendChild(dateNode);
         dateSpan.className = "dateSpan";
         item.appendChild(dateSpan);
@@ -252,8 +253,14 @@ $(()=>{
         // Adds an click event listener to the remove button to remove the item from the list.
         completeBtn.addEventListener("click", completedItem);
 
+        // Checks if input value and if true, invokes storeItemInLocal.
+        if(input.value !== ""){
+            storeItemInLocalStorage(itemList);
+        }
+
         // Clears the input field after task is added to the list
         input.value = "";
+
     };
 
     // Checks if the textContent of the list item has characters matching value that the user inserted in the search field.
@@ -283,8 +290,48 @@ $(()=>{
                 }
             }
         }
-
     });
+
+    // This IIFE will check if there is any tasks stored in the LocalStorage object.
+    // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems
+    // function to render the tasks in the document(DOM).
+    (function getStorageItems(){
+        if(localStorage.length > 0){
+
+            let storage = JSON.parse(localStorage.getItem("tasks"));
+
+            let storageLength = storage.length;
+            for(let i = 0; i < storageLength; i++){
+                addItem(storage[i].pTag, storage[i].spanTag);
+            }
+        }
+    })();
+
+    // Object constructor template that converts each task in the list in an object.
+    // This function will be invoked in the storeItemInLocaleStorage to store the tasks list.
+    function CreateTasksObj(pTag, span){
+        this.pTag = pTag;
+        this.spanTag = span;
+    }
+
+    // Function that will stringify the tasks to store them in the browsers localStorage object using the Web Storage API.
+    let storeItemInLocalStorage = (list) => {
+        if(list.childElementCount > 0){
+            let listItems = document.querySelectorAll(" #listUl li");
+
+            let taskArr = [];
+
+            for(let i = 0; i < listItems.length; i++) {
+                let paragraph = listItems[i].childNodes[0].textContent;
+                let span = listItems[i].childNodes[1].textContent;
+
+                let taskObj = new CreateTasksObj(paragraph, span);
+                taskArr.push(taskObj);
+            }
+
+            localStorage.setItem("tasks",JSON.stringify(taskArr));
+        }
+    }
 
 });
 
