@@ -4,6 +4,10 @@
 .idea/dictionaries
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
+.idea/libraries/Generated_files.xml
+.idea/todoApp.iml
+.idea/watcherTasks.xml
+
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
