@@ -46,7 +46,7 @@ $(function () {
 
     // This function will check if item has the data-level attr. If true, it will be removed and invoke hidePriorityViewToggleBtn.
     // If false, priorityItem function will be invoked
-    var checkPriorityLevel = function checkPriorityLevel(e) {
+    var checkPriorityLevel = function checkPriorityLevel(e, passedItem) {
         var item = e.target.parentNode.parentNode;
         if (item.getAttribute("data-level")) {
             item.removeAttribute("data-level");
@@ -58,14 +58,13 @@ $(function () {
     };
 
     // This function will apply data attr value of priority to the item and move the item to the
-    // top off the list mark it as a priority by applying specific CSS styles and invoke showPriorityViewToggleBtn.
+    // top off the list. Then applies specific CSS styles for priority tasks and invoke showPriorityViewToggleBtn.
     var priorityItem = function priorityItem(item) {
         item.setAttribute("data-level", "priority");
         item.classList.add("priority-item");
         var parent = item.parentNode;
         item.parentNode.insertBefore(item, parent.childNodes[0]);
         showPriorityViewToggleBtn();
-        storeItemInLocalStorage(itemList, completedItemList);
     };
 
     // This function will show the priority button that will change view to only show task labeled
@@ -132,7 +131,7 @@ $(function () {
         }
     };
 
-    // Function that will delete the list item form the items list and invoke function checkForPriorityLabeledTask
+    // Function that will delete the task from the tasks list and invoke function checkForPriorityLabeledTask
     var deleteItem = function deleteItem(e) {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
@@ -141,7 +140,7 @@ $(function () {
         storeItemInLocalStorage(itemList, completedItemList);
     };
 
-    // Function that will invoked the hidePriorityViewToggleBtn function if one of the lists is > 0 (items);
+    // Function that will invoked the hidePriorityViewToggleBtn function if the task list > 0 ;
     var checkForPriorityLabeledTask = function checkForPriorityLabeledTask() {
         if (itemList.childElementCount > 0) {
             hidePriorityViewToggleBtn(itemList);
@@ -242,10 +241,6 @@ $(function () {
         // Insert the li element into the DOM ul element with id of #listUl.
         itemList.insertBefore(item, itemList.childNodes[0]);
 
-        if (dataAttr === "priority") {
-            priorityItem(item);
-        }
-
         // Adds an click event listener to the priority button to move items marked as priority to the top of the list.
         priorityBtn.addEventListener("click", checkPriorityLevel);
 
@@ -342,10 +337,12 @@ $(function () {
     // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems
     // function to render the tasks in the document(DOM).
     (function getStorageItems() {
+        console.log(localStorage);
+
         if (localStorage.length > 0) {
             var storage = JSON.parse(localStorage.getItem("tasks"));
-
             var storageLength = storage.length;
+
             for (var i = 0; i < storageLength; i++) {
                 addItem(storage[i].pTag, storage[i].spanTag, storage[i].priority);
             }
