@@ -24,9 +24,9 @@ $(()=>{
     let itemList = document.getElementById("listUl");
     let completedItemList = document.getElementById("completedListUl");
     let input = document.getElementById("userInput");
-    let completedList = document.getElementById("completedListUl");
     const priorityListBtn = document.getElementById("priorityListBtn");
     let searchFieldInput = document.getElementById("searchInputField");
+
 
 
     // Click event listener that will get the value from the input form,
@@ -34,7 +34,6 @@ $(()=>{
     addBtn.addEventListener("click", () => {
         let text = input.value;
         text ? addItem(text) : console.log("No user input");
-
     });
 
     // Event listener that will get the value from the input form when the enterKey is pressed,
@@ -43,7 +42,6 @@ $(()=>{
         if(e.keyCode === 13){
             let text = input.value;
             text ? addItem(text, getDate()) : console.log("No user input");
-
         }
     });
 
@@ -68,6 +66,7 @@ $(()=>{
         let parent = item.parentNode;
         item.parentNode.insertBefore(item,parent.childNodes[0]);
         showPriorityViewToggleBtn();
+        storeItemInLocalStorage(itemList, completedItemList)
     };
 
     // This function will show the priority button that will change view to only show task labeled
@@ -140,6 +139,8 @@ $(()=>{
         let parent = item.parentNode;
         parent.removeChild(item);
         checkForPriorityLabeledTask();
+        storeItemInLocalStorage(itemList, completedItemList);
+
     };
 
     // Function that will invoked the hidePriorityViewToggleBtn function if one of the lists is > 0 (items);
@@ -158,7 +159,7 @@ $(()=>{
         item.children[1].textContent = `Completed on: ${getDate()}`;
 
         if(parent.getAttribute("id") !== "completedListUl"){
-            completedList.insertBefore(parent.removeChild(item), completedList.childNodes[0]);
+            completedItemList.insertBefore(parent.removeChild(item), completedItemList.childNodes[0]);
             hidePriorityBtn(e);
         }else {
             itemList.appendChild(item);
@@ -189,9 +190,8 @@ $(()=>{
         return getDate;
     };
 
-
     // Function that will add items to the list. The parameter passed to the function is received from the addBtn event listener.
-    let addItem = (text ,spanTag) =>{
+    let addItem = (text ,spanTag, dataAttr) =>{
 
         // Creates an li element and set the id attribute
         const item = document.createElement("li");
@@ -241,8 +241,12 @@ $(()=>{
         // Appends the buttonDiv element to the li element.
         item.appendChild(buttonsDiv);
 
-        // Insert the li element into the DOM ul element with and id of #listUl.
+        // Insert the li element into the DOM ul element with id of #listUl.
         itemList.insertBefore(item,itemList.childNodes[0]);
+
+        if(dataAttr === "priority"){
+            priorityItem(item);
+        }
 
         // Adds an click event listener to the priority button to move items marked as priority to the top of the list.
         priorityBtn.addEventListener("click", checkPriorityLevel);
@@ -255,7 +259,7 @@ $(()=>{
 
         // Checks if input value and if true, invokes storeItemInLocal.
         if(input.value !== ""){
-            storeItemInLocalStorage(itemList);
+            storeItemInLocalStorage(itemList, completedItemList);
         }
 
         // Clears the input field after task is added to the list
@@ -292,46 +296,63 @@ $(()=>{
         }
     });
 
+
+    // Object constructor template that converts each task in the list in an object.
+    // This function will be invoked in the storeItemInLocaleStorage to store the tasks list.
+    function CreateTasksObj(pTag, span, priorityLevel){
+        this.pTag = pTag;
+        this.spanTag = span;
+        this.priority = priorityLevel ;
+    }
+
+    // Function that will stringify the tasks to store them in the browsers localStorage object using the Web Storage API.
+    let storeItemInLocalStorage = (tasksList, completedTasksList) => {
+        let taskArr = [];
+
+        if(tasksList.childElementCount > 0){
+            let paragraph, span, priorityLevel;
+            let listItems = document.querySelectorAll("#listUl li");
+
+            for(let i = 0; i < listItems.length; i++) {
+                paragraph = listItems[i].childNodes[0].textContent;
+                span = listItems[i].childNodes[1].textContent;
+                priorityLevel = tasksList.children[i].getAttribute("data-level");
+                let taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
+                taskArr.push(taskObj);
+            }
+        }
+
+        else if(completedTasksList.childElementCount > 0){
+            let paragraph, span, priorityLevel;
+            let listItems = document.querySelectorAll("#completedListUl li");
+
+            for(let i = 0; i < listItems.length; i++) {
+                paragraph = listItems[i].childNodes[0].textContent;
+                span = listItems[i].childNodes[1].textContent;
+                priorityLevel = completedTasksList.children[i].getAttribute("data-level");
+                let taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
+                taskArr.push(taskObj);
+            }
+        }
+        localStorage.setItem("tasks",JSON.stringify(taskArr));
+        console.log(localStorage);
+
+        return;
+    };
+
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
     // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems
     // function to render the tasks in the document(DOM).
     (function getStorageItems(){
         if(localStorage.length > 0){
-
             let storage = JSON.parse(localStorage.getItem("tasks"));
 
             let storageLength = storage.length;
             for(let i = 0; i < storageLength; i++){
-                addItem(storage[i].pTag, storage[i].spanTag);
+                addItem(storage[i].pTag, storage[i].spanTag, storage[i].priority);
             }
         }
     })();
-
-    // Object constructor template that converts each task in the list in an object.
-    // This function will be invoked in the storeItemInLocaleStorage to store the tasks list.
-    function CreateTasksObj(pTag, span){
-        this.pTag = pTag;
-        this.spanTag = span;
-    }
-
-    // Function that will stringify the tasks to store them in the browsers localStorage object using the Web Storage API.
-    let storeItemInLocalStorage = (list) => {
-        if(list.childElementCount > 0){
-            let listItems = document.querySelectorAll(" #listUl li");
-
-            let taskArr = [];
-
-            for(let i = 0; i < listItems.length; i++) {
-                let paragraph = listItems[i].childNodes[0].textContent;
-                let span = listItems[i].childNodes[1].textContent;
-
-                let taskObj = new CreateTasksObj(paragraph, span);
-                taskArr.push(taskObj);
-            }
-
-            localStorage.setItem("tasks",JSON.stringify(taskArr));
-        }
-    }
 
 });
 
