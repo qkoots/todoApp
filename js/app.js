@@ -12,7 +12,7 @@
 // Integrate Web Storage API to save data in the Storage object(localStorage).
 
 //TODO Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
-//TODO Task in LocalStorage that has been completed should be rendered in the completedTasksList when page is refresh/reload/visited again.
+//TODO Task in LocalStorage that has already been completed should be rendered in the completedTasksList when page is refresh/reload/visited again.
 //TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
@@ -45,14 +45,16 @@ $(()=>{
         }
     });
 
-    // This function will check if item has the data-level attr. If true, it will be removed and invoke hidePriorityViewToggleBtn.
+    // This function will check if item has the data-level attr when a user triggers the event(priorityBtn).
+    // If true, it will be removed and invoke hidePriorityViewToggleBtn.
     // If false, priorityItem function will be invoked
-    const checkPriorityLevel = (e, passedItem) =>{
-        let item   = e.target.parentNode.parentNode;
+    const checkPriorityLevel = e =>{
+        let item = e.target.parentNode.parentNode;
         if(item.getAttribute("data-level")){
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
             hidePriorityViewToggleBtn(itemList);
+            prepToStore(itemList, completedItemList)
         }else {
             priorityItem(item);
         }
@@ -66,10 +68,11 @@ $(()=>{
         let parent = item.parentNode;
         item.parentNode.insertBefore(item,parent.childNodes[0]);
         showPriorityViewToggleBtn();
+        prepToStore(itemList,completedItemList);
     };
 
     // This function will show the priority button that will change view to only show task labeled
-    // as priority (if there is 1 or more task with priority label).
+    // as priority (if there is 1 or more task with labeled as priority).
     const showPriorityViewToggleBtn = () => {
         for(let i = 0 ; i < itemList.children.length; i++) {
             if(itemList.children[i].getAttribute("data-level") === "priority"){
@@ -80,7 +83,7 @@ $(()=>{
         priorityListBtn.addEventListener("click",showPriorityLabeledItems);
     };
 
-    // This function shows only the task in the tasksList that has been labeled as priority task (hiding non-priority tasks);
+    // This function shows only the task in the tasksList that has been labeled as priority(hiding non-priority tasks);
     const showPriorityLabeledItems = () => {
         for(let i = 0 ; i < itemList.children.length; i++) {
             if(itemList.children[i].getAttribute("data-level") === null) {
@@ -138,7 +141,7 @@ $(()=>{
         let parent = item.parentNode;
         parent.removeChild(item);
         checkForPriorityLabeledTask();
-        storeItemInLocalStorage(itemList, completedItemList);
+        prepToStore(itemList, completedItemList);
 
     };
 
@@ -183,6 +186,7 @@ $(()=>{
         priorityBtn.style.display = "none";
     };
 
+    //
     const getDate = () => {
         const date     = new Date();
         let getDate  = date.toDateString();
@@ -252,9 +256,16 @@ $(()=>{
         // Adds an click event listener to the remove button to remove the item from the list.
         completeBtn.addEventListener("click", completedItem);
 
-        // Checks if input value and if true, invokes storeItemInLocal.
+        // Checks if input value and if true, invokes prepToStore function.
         if(input.value !== ""){
-            storeItemInLocalStorage(itemList, completedItemList);
+            prepToStore(itemList, completedItemList);
+        }
+
+        if(dataAttr == "priority"){
+            item.classList.add("priority-item");
+            //let parent = item.parentNode;
+            //item.parentNode.insertBefore(item,parent.childNodes[0]);
+            showPriorityViewToggleBtn();
         }
 
         // Clears the input field after task is added to the list
@@ -271,20 +282,20 @@ $(()=>{
     }
 
     // Function gets the list items (li elements) and calls the loopTasksLists function whenever a task list is >= 0
-    let storeItemInLocalStorage = (tasksList, completedTasksList) => {
+    let prepToStore = (tasksList, completedTasksList) => {
         let listItems = document.querySelectorAll("#listUl li");
         let completedlistItems = document.querySelectorAll("#completedListUl li");
 
         if(tasksList.childElementCount >= 0){
-            loopTaskLists(listItems, tasksList);
+            loopTaskListsAndStore(listItems, tasksList);
         } else if(completedTasksList.childElementCount >= 0){
-            loopTaskLists(completedlistItems,completedTasksList);
+            loopTaskListsAndStore(completedlistItems,completedTasksList);
         }
     };
 
     // This function loops the Task list to create an object of each task in the lists, stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
-    let loopTaskLists = (listItems, taskList) => {
+    let loopTaskListsAndStore = (listItems, taskList) => {
         let taskArr = [];
         let paragraph, span, priorityLevel;
 
