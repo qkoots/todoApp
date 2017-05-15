@@ -25,7 +25,7 @@ $(function () {
     // Saving the DOM elements in a variables
     var addBtn = document.getElementById("addBtn");
     var todoListUl = document.getElementById("todolistUl");
-    var completedItemList = document.getElementById("completedListUl");
+    var completeListUl = document.getElementById("completedListUl");
     var input = document.getElementById("userInput");
     var priorityListBtn = document.getElementById("priorityListBtn");
     var searchFieldInput = document.getElementById("searchInputField");
@@ -55,7 +55,7 @@ $(function () {
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
             hidePriorityViewToggleBtn(todoListUl);
-            prepToStore(todoListUl, completedItemList);
+            prepToStore(todoListUl, completeListUl);
         } else {
             priorityItem(item);
         }
@@ -69,7 +69,7 @@ $(function () {
         var parent = item.parentNode;
         item.parentNode.insertBefore(item, parent.childNodes[0]);
         showPriorityViewToggleBtn();
-        prepToStore(todoListUl, completedItemList);
+        prepToStore(todoListUl, completeListUl);
     };
 
     // This function will show the priority button that will change view to only show tasks labeled
@@ -142,15 +142,15 @@ $(function () {
         var parent = item.parentNode;
         parent.removeChild(item);
         checkForPriorityLabeledTask();
-        prepToStore(todoListUl, completedItemList);
+        prepToStore(todoListUl, completeListUl);
     };
 
     // Function that will invoked the hidePriorityViewToggleBtn function if the todolist > 0 ;
     var checkForPriorityLabeledTask = function checkForPriorityLabeledTask() {
         if (todoListUl.childElementCount > 0) {
             hidePriorityViewToggleBtn(todoListUl);
-        } else if (completedItemList.childElementCount > 0) {
-            hidePriorityViewToggleBtn(completedItemList);
+        } else if (completeListUl.childElementCount > 0) {
+            hidePriorityViewToggleBtn(completeListUl);
         }
     };
 
@@ -162,7 +162,7 @@ $(function () {
         item.classList.add("complete");
 
         if (parent.getAttribute("id") !== "completedListUl") {
-            completedItemList.insertBefore(parent.removeChild(item), completedItemList.childNodes[0]);
+            completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
             hidePriorityBtn(e);
         } else {
             todoListUl.appendChild(item);
@@ -261,7 +261,7 @@ $(function () {
 
         // Checks if input value and if true, invokes prepToStore function.
         if (input.value !== "") {
-            prepToStore(todoListUl, completedItemList);
+            prepToStore(todoListUl, completeListUl);
         }
 
         // This if statement only executes when the IIFE (getStorageItems) runs and return the task(s) stored in the localStorage
@@ -334,7 +334,7 @@ $(function () {
     // Event listener for searching specific tasks in the todolist and the completedtaskList
     searchFieldInput.addEventListener("keyup", function () {
         searchTask(todoListUl);
-        searchTask(completedItemList);
+        searchTask(completeListUl);
     });
 
     // Checks if the textContent of the tasks has characters matching value that the user inserted in the search field.
