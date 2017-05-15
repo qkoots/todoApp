@@ -11,8 +11,8 @@
 // integrate search method to search for specific items.
 // Search should ignore case-sensitivity.
 // Integrate Web Storage API to save data in the Storage object(localStorage).
+//Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
 
-//TODO Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
 //TODO Task in LocalStorage that has already been completed should be rendered in the completedTasksList when page is refresh/reload/visited again.
 //TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
 //TODO Replace icons using font awesome icons.
@@ -24,7 +24,7 @@ $(function () {
 
     // Saving the DOM elements in a variables
     var addBtn = document.getElementById("addBtn");
-    var itemList = document.getElementById("listUl");
+    var todoListUl = document.getElementById("todolistUl");
     var completedItemList = document.getElementById("completedListUl");
     var input = document.getElementById("userInput");
     var priorityListBtn = document.getElementById("priorityListBtn");
@@ -54,29 +54,29 @@ $(function () {
         if (item.getAttribute("data-level")) {
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
-            hidePriorityViewToggleBtn(itemList);
-            prepToStore(itemList, completedItemList);
+            hidePriorityViewToggleBtn(todoListUl);
+            prepToStore(todoListUl, completedItemList);
         } else {
             priorityItem(item);
         }
     };
 
-    // This function will apply data attr value of priority to the item and move the item to the
-    // top off the list. Then applies specific CSS styles for priority tasks and invoke showPriorityViewToggleBtn.
+    // This function will apply data attr value of priority to the task and moves it
+    // top off the todolist. Then applies specific CSS styles for task labeled as priority and invoke showPriorityViewToggleBtn.
     var priorityItem = function priorityItem(item) {
         item.setAttribute("data-level", "priority");
         item.classList.add("priority-item");
         var parent = item.parentNode;
         item.parentNode.insertBefore(item, parent.childNodes[0]);
         showPriorityViewToggleBtn();
-        prepToStore(itemList, completedItemList);
+        prepToStore(todoListUl, completedItemList);
     };
 
-    // This function will show the priority button that will change view to only show task labeled
+    // This function will show the priority button that will change view to only show tasks labeled
     // as priority (if there is 1 or more task with labeled as priority).
     var showPriorityViewToggleBtn = function showPriorityViewToggleBtn() {
-        for (var i = 0; i < itemList.children.length; i++) {
-            if (itemList.children[i].getAttribute("data-level") === "priority") {
+        for (var i = 0; i < todoListUl.children.length; i++) {
+            if (todoListUl.children[i].getAttribute("data-level") === "priority") {
                 priorityListBtn.style.display = "inline-block";
             }
         }
@@ -84,11 +84,11 @@ $(function () {
         priorityListBtn.addEventListener("click", showPriorityLabeledItems);
     };
 
-    // This function shows only the task in the tasksList that has been labeled as priority(hiding non-priority tasks);
+    // This function shows only the task in the todoList that has been labeled as priority(hiding non-priority tasks).
     var showPriorityLabeledItems = function showPriorityLabeledItems() {
-        for (var i = 0; i < itemList.children.length; i++) {
-            if (itemList.children[i].getAttribute("data-level") === null) {
-                itemList.children[i].style.display = "none";
+        for (var i = 0; i < todoListUl.children.length; i++) {
+            if (todoListUl.children[i].getAttribute("data-level") === null) {
+                todoListUl.children[i].style.display = "none";
             }
         }
 
@@ -99,11 +99,11 @@ $(function () {
         priorityListBtn.addEventListener("click", showAllItems);
     };
 
-    // This function will display all items in the task list if the recent view was to view to only show tasks labeled as priority
+    // This function will display all task in the todolist if the recent view was to only show tasks labeled as priority.
     var showAllItems = function showAllItems() {
-        for (var i = 0; i < itemList.children.length; i++) {
-            if (itemList.children[i].getAttribute("data-level") === null) {
-                itemList.children[i].style.display = "";
+        for (var i = 0; i < todoListUl.children.length; i++) {
+            if (todoListUl.children[i].getAttribute("data-level") === null) {
+                todoListUl.children[i].style.display = "";
             }
         }
         // Changes the text of the button when all tasks are displayed.
@@ -116,10 +116,10 @@ $(function () {
         priorityListBtn.addEventListener("click", showPriorityLabeledItems);
     };
 
-    // This function will hide the priority button that will change view to only show task labeled as priority. (if there is NO task with priority label).
+    // This function will hide the priority button that will show only tasks labeled as priority. (if there is NO task with priority label).
     var hidePriorityViewToggleBtn = function hidePriorityViewToggleBtn(list) {
 
-        // counter keeping track of how many items in the list have the data-level attribute
+        // counter keeping track of how many task in the list have the data-level attribute.
         var count = 0;
 
         for (var i = 0; i < list.children.length; i++) {
@@ -136,41 +136,43 @@ $(function () {
         }
     };
 
-    // Function that will delete the task from the tasks list and invoke function checkForPriorityLabeledTask
+    // Function that will delete the task from the todolist/completedList and invoke function checkForPriorityLabeledTask
     var deleteItem = function deleteItem(e) {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
         parent.removeChild(item);
         checkForPriorityLabeledTask();
-        prepToStore(itemList, completedItemList);
+        prepToStore(todoListUl, completedItemList);
     };
 
-    // Function that will invoked the hidePriorityViewToggleBtn function if the task list > 0 ;
+    // Function that will invoked the hidePriorityViewToggleBtn function if the todolist > 0 ;
     var checkForPriorityLabeledTask = function checkForPriorityLabeledTask() {
-        if (itemList.childElementCount > 0) {
-            hidePriorityViewToggleBtn(itemList);
+        if (todoListUl.childElementCount > 0) {
+            hidePriorityViewToggleBtn(todoListUl);
         } else if (completedItemList.childElementCount > 0) {
             hidePriorityViewToggleBtn(completedItemList);
         }
     };
 
-    // Function that will remove item form the items list and put it on the completed tasks list and invoke hidePriorityBtn function.
+    // Function that will remove task from the todolist and moves it to the completedtaskList and invoke hidePriorityBtn function.
     var completedItem = function completedItem(e) {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
         item.children[1].textContent = "Completed on: " + getDate();
+        item.classList.add("complete");
 
         if (parent.getAttribute("id") !== "completedListUl") {
             completedItemList.insertBefore(parent.removeChild(item), completedItemList.childNodes[0]);
             hidePriorityBtn(e);
         } else {
-            itemList.appendChild(item);
+            todoListUl.appendChild(item);
             item.style.textDecoration = "";
             displayPriorityBtn(e);
+            item.classList.remove("complete");
         }
     };
 
-    // Function will display the priority button when item is moved back from "completed task list" to the "still to do" task list.
+    // Function will display the priority button when task is moved back from "completedtaskList" to the todolist.
     var displayPriorityBtn = function displayPriorityBtn(e) {
         var item = e.target.parentNode;
         var parent = item.parentNode;
@@ -178,7 +180,7 @@ $(function () {
         priorityBtn.style.display = "inline-block";
     };
 
-    // Function will hide the priority button when item is moved to the completed tasks list.
+    // Function will hide the priority button when task is moved to the completedtasklist.
     var hidePriorityBtn = function hidePriorityBtn(e) {
         var item = e.target.parentNode;
         var parent = item.parentNode;
@@ -186,14 +188,15 @@ $(function () {
         priorityBtn.style.display = "none";
     };
 
-    //
+    // Function that gets the current date.
     var getDate = function getDate() {
         var date = new Date();
         var getDate = date.toDateString();
         return getDate;
     };
 
-    // Function that will add items to the list. The parameter passed to the function is received from the addBtn event listener.
+    // Function that will add task to the todolist. The parameter passed to the function is received from the addBtn eventlistener
+    // or from the getStorageItem IIFE.
     var addItem = function addItem(text, spanTag, dataAttr) {
 
         // Creates an li element and set the id attribute
@@ -213,11 +216,11 @@ $(function () {
         dateSpan.className = "dateSpan";
         item.appendChild(dateSpan);
 
-        // Creates a Div element for the remove and complete buttons for every item in the list
+        // Creates a Div element for the remove and complete buttons for every task in the todolist.
         var buttonsDiv = document.createElement("div");
         buttonsDiv.className = "buttonsDiv";
 
-        // Creates the priority button so priority tasks can be moved to top of the list
+        // Creates the priority button so tasks can be labeled as priority. Button will be appended as a child to the buttonDiv element.
         var priorityBtn = document.createElement("button");
         var priorityBtnNode = document.createTextNode("*");
         priorityBtn.classList.add("btn", "btn-info");
@@ -225,7 +228,7 @@ $(function () {
         priorityBtn.appendChild(priorityBtnNode);
         buttonsDiv.appendChild(priorityBtn);
 
-        // Creates the remove button to remove items from the list and append it as an child to the buttonDiv element.
+        // Creates the remove button to remove tasks from the todolist. Button will be appended as a child to the buttonDiv element.
         var removeBtn = document.createElement("button");
         var removeBtnNode = document.createTextNode("X");
         removeBtn.classList.add("btn", "btn-danger");
@@ -233,7 +236,7 @@ $(function () {
         removeBtn.appendChild(removeBtnNode);
         buttonsDiv.appendChild(removeBtn);
 
-        // Creates the complete button to add completed items to the completed tasks list and append it as an child to the buttonDiv element.
+        // Creates the complete button to mark task as completed. Button will be appended as a child to the buttonDiv element.
         var completeBtn = document.createElement("button");
         var completeBtnNode = document.createTextNode("√");
         completeBtn.classList.add("btn", "btn-success");
@@ -244,27 +247,27 @@ $(function () {
         // Appends the buttonDiv element to the li element.
         item.appendChild(buttonsDiv);
 
-        // Insert the li element into the DOM ul element with id of #listUl.
-        itemList.insertBefore(item, itemList.childNodes[0]);
+        // Insert the li element into the DOM ul element with id of #todolistUl.
+        todoListUl.insertBefore(item, todoListUl.childNodes[0]);
 
-        // Adds an click event listener to the priority button to move items marked as priority to the top of the list.
+        // Adds an click event listener to the priority button.
         priorityBtn.addEventListener("click", checkPriorityLevel);
 
-        // Adds an click event listener to the remove button to remove the item from the list.
+        // Adds an click event listener to the remove button.
         removeBtn.addEventListener("click", deleteItem);
 
-        // Adds an click event listener to the remove button to remove the item from the list.
+        // Adds an click event listener to the complete button.
         completeBtn.addEventListener("click", completedItem);
 
         // Checks if input value and if true, invokes prepToStore function.
         if (input.value !== "") {
-            prepToStore(itemList, completedItemList);
+            prepToStore(todoListUl, completedItemList);
         }
 
+        // This if statement only executes when the IIFE (getStorageItems) runs and return the task(s) stored in the localStorage
         if (dataAttr == "priority") {
+            item.setAttribute("data-level", "priority");
             item.classList.add("priority-item");
-            //let parent = item.parentNode;
-            //item.parentNode.insertBefore(item,parent.childNodes[0]);
             showPriorityViewToggleBtn();
         }
 
@@ -272,17 +275,18 @@ $(function () {
         input.value = "";
     };
 
-    // Object constructor template that converts each task in the list in an object.
-    // This function will be invoked in the storeItemInLocaleStorage to store the tasks list.
+    // Object constructor template that converts each task in the list(s) in an object.
+    // This function will be invoked in the loopTaskListsAndStore function to store the list.
     function CreateTasksObj(pTag, span, priorityLevel) {
         this.pTag = pTag;
         this.spanTag = span;
         this.priority = priorityLevel;
     }
 
-    // Function gets the list items (li elements) and calls the loopTasksLists function whenever a task list is >= 0
+    // This function gets the child elements of both the todolistUL and the completedlistUl and calls the loopTasksLists function
+    // whenever one ot them is >= 0.
     var prepToStore = function prepToStore(tasksList, completedTasksList) {
-        var listItems = document.querySelectorAll("#listUl li");
+        var listItems = document.querySelectorAll("#todolistUl li");
         var completedlistItems = document.querySelectorAll("#completedListUl li");
 
         if (tasksList.childElementCount >= 0) {
@@ -292,7 +296,7 @@ $(function () {
         }
     };
 
-    // This function loops the Task list to create an object of each task in the lists, stringify them and store
+    // This function loops the todolist and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
     var loopTaskListsAndStore = function loopTaskListsAndStore(listItems, taskList) {
         var taskArr = [];
@@ -322,19 +326,19 @@ $(function () {
             var storageLength = storage.length;
 
             for (var i = 0; i < storageLength; i++) {
-                addItem(storage[i].pTag, storage[i].spanTag, storage[i].priority);
+                addItem(storage[i].pTag, storage[i].spanTag, storage[i].priority, storage[i].class);
             }
         }
     })();
 
-    // Event listener for searching specific tasks in the list
+    // Event listener for searching specific tasks in the todolist and the completedtaskList
     searchFieldInput.addEventListener("keyup", function () {
-        searchTask(itemList);
+        searchTask(todoListUl);
         searchTask(completedItemList);
     });
 
-    // Checks if the textContent of the list item has characters matching value that the user inserted in the search field.
-    // if value matches, it will show only those items matching the search value and hides the rest of the items
+    // Checks if the textContent of the tasks has characters matching value that the user inserted in the search field.
+    // if value matches, it will show only the task(s) matching the search value and hides the rest of the tasks.
     var searchTask = function searchTask(list) {
         var value = searchFieldInput.value;
         var pat = new RegExp(value);
