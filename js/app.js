@@ -7,11 +7,13 @@
 // View option to only see the priority items.
 // Empty input form after items has been added.
 // Display date when task was send to completed list.
-// integrate search method to search for specific items
-// Search should ignore case-sensitivity
+// integrate search method to search for specific items.
+// Search should ignore case-sensitivity.
+// Integrate Web Storage API to save data in the Storage object(localStorage).
 
+//TODO Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
+//TODO Task in LocalStorage that has been completed should be rendered in the completedTasksList when page is refresh/reload/visited again.
 //TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
-//TODO Integrate Web Storage API to save data in the browser.
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
@@ -260,35 +262,6 @@ $(()=>{
 
     };
 
-    // Checks if the textContent of the list item has characters matching value that the user inserted in the search field.
-    // if value matches, it will show only those items matching the search value and hides the rest of the items
-    searchFieldInput.addEventListener("keyup",()=>{
-        let value = searchFieldInput.value;
-        let pat = new RegExp(value);
-
-        if(itemList.childElementCount > 0){
-            for( let i = 0; i < itemList.childElementCount; i++) {
-                let getContent = itemList.children[i].firstElementChild.textContent.toLowerCase();
-                if(!getContent.match(pat)){
-                    itemList.children[i].style.display ="none";
-                }else {
-                    itemList.children[i].style.display ="";
-                }
-            }
-        }
-
-        if(completedItemList.childElementCount > 0){
-            for( let i = 0; i < completedItemList.childElementCount; i++) {
-                let getContent = completedItemList.children[i].firstElementChild.textContent.toLowerCase();
-                if(!getContent.match(pat)){
-                    completedItemList.children[i].style.display ="none";
-                }else {
-                    completedItemList.children[i].style.display ="";
-                }
-            }
-        }
-    });
-
     // Object constructor template that converts each task in the list in an object.
     // This function will be invoked in the storeItemInLocaleStorage to store the tasks list.
     function CreateTasksObj(pTag, span, priorityLevel){
@@ -347,6 +320,31 @@ $(()=>{
             }
         }
     })();
+
+
+    // Event listener for searching specific tasks in the list
+    searchFieldInput.addEventListener("keyup",()=>{
+        searchTask(itemList);
+        searchTask(completedItemList);
+    });
+
+    // Checks if the textContent of the list item has characters matching value that the user inserted in the search field.
+    // if value matches, it will show only those items matching the search value and hides the rest of the items
+    let searchTask = (list) => {
+        let value = searchFieldInput.value;
+        let pat = new RegExp(value);
+
+        if(list.childElementCount > 0){
+            for( let i = 0; i < list.childElementCount; i++) {
+                let getContent = list.children[i].firstElementChild.textContent.toLowerCase();
+                if(!getContent.match(pat)){
+                    list.children[i].style.display ="none";
+                }else {
+                    list.children[i].style.display ="";
+                }
+            }
+        }
+    };
 
 });
 
