@@ -269,41 +269,35 @@ $(function () {
         this.priority = priorityLevel;
     }
 
-    // Function that will stringify the tasks to store them in the browsers localStorage object using the Web Storage API.
+    // Function gets the list items (li elements) and calls the loopTasksLists function whenever a task list is >= 0
     var storeItemInLocalStorage = function storeItemInLocalStorage(tasksList, completedTasksList) {
+        var listItems = document.querySelectorAll("#listUl li");
+        var completedlistItems = document.querySelectorAll("#completedListUl li");
+
+        if (tasksList.childElementCount >= 0) {
+            loopTaskLists(listItems, tasksList);
+        } else if (completedTasksList.childElementCount >= 0) {
+            loopTaskLists(completedlistItems, completedTasksList);
+        }
+    };
+
+    // This function loops the Task list to create an object of each task in the lists, stringify them and store
+    // them in the browsers localStorage object using the Web Storage API.
+    var loopTaskLists = function loopTaskLists(listItems, taskList) {
         var taskArr = [];
+        var paragraph = void 0,
+            span = void 0,
+            priorityLevel = void 0;
 
-        if (tasksList.childElementCount > 0) {
-            var paragraph = void 0,
-                span = void 0,
-                priorityLevel = void 0;
-            var listItems = document.querySelectorAll("#listUl li");
-
-            for (var i = 0; i < listItems.length; i++) {
-                paragraph = listItems[i].childNodes[0].textContent;
-                span = listItems[i].childNodes[1].textContent;
-                priorityLevel = tasksList.children[i].getAttribute("data-level");
-                var taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
-                taskArr.push(taskObj);
-            }
-        } else if (completedTasksList.childElementCount > 0) {
-            var _paragraph = void 0,
-                _span = void 0,
-                _priorityLevel = void 0;
-            var _listItems = document.querySelectorAll("#completedListUl li");
-
-            for (var _i = 0; _i < _listItems.length; _i++) {
-                _paragraph = _listItems[_i].childNodes[0].textContent;
-                _span = _listItems[_i].childNodes[1].textContent;
-                _priorityLevel = completedTasksList.children[_i].getAttribute("data-level");
-                var _taskObj = new CreateTasksObj(_paragraph, _span, _priorityLevel);
-                taskArr.push(_taskObj);
-            }
+        for (var i = 0; i < listItems.length; i++) {
+            paragraph = listItems[i].childNodes[0].textContent;
+            span = listItems[i].childNodes[1].textContent;
+            priorityLevel = taskList.children[i].getAttribute("data-level");
+            var taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
+            taskArr.push(taskObj);
         }
         localStorage.setItem("tasks", JSON.stringify(taskArr));
         console.log(localStorage);
-
-        return;
     };
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
