@@ -166,15 +166,15 @@ $(function () {
 
         if (parent.getAttribute("id") !== "completedListUl") {
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
-            hidePriorityBtn(e);
             prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
+            hidePriorityBtn(e);
         } else {
             todoListUl.appendChild(item);
             item.style.textDecoration = "";
-            item.children[1].textContent = "Created on: " + getDate();
+            //item.children[1].textContent = `Created on: ${getDate()}`;
             displayPriorityBtn(e);
             item.classList.remove("complete");
-            prepToStoreTodoList(todoListUl);
         }
     };
 
@@ -298,6 +298,7 @@ $(function () {
     // whenever one of them is >= 0.
     var prepToStoreTodoList = function prepToStoreTodoList(todoListUl) {
         var todoList_Items = document.querySelectorAll("#todolistUl li");
+        console.log(todoList_Items);
 
         if (todoList_Items.length >= 0) {
             loopTodoListAndStore(todoListUl, todoList_Items);
@@ -307,8 +308,8 @@ $(function () {
     // This function loops the lists and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
     var loopTodoListAndStore = function loopTodoListAndStore(list_Ul, list_Items) {
-        var todoArr = [];
-        var paragraph = void 0,
+        var todoArr = [],
+            paragraph = void 0,
             span = void 0,
             priorityLevel = void 0;
 
@@ -320,11 +321,11 @@ $(function () {
             todoArr.push(taskObj);
         }
         localStorage.setItem("todo", JSON.stringify(todoArr));
-        //console.log(localStorage);
     };
 
     var prepToStoreCompletedList = function prepToStoreCompletedList(completedListUl) {
         var completedList_Items = document.querySelectorAll("#completedListUl li");
+        console.log(completedList_Items);
 
         if (completedList_Items.length >= 0) {
             loopCompletedListAndStore(completedListUl, completedList_Items);
@@ -332,8 +333,8 @@ $(function () {
     };
 
     var loopCompletedListAndStore = function loopCompletedListAndStore(list_Ul, list_Items) {
-        var completeArr = [];
-        var paragraph = void 0,
+        var completeArr = [],
+            paragraph = void 0,
             span = void 0,
             priorityLevel = void 0,
             completeClass = void 0;
@@ -351,7 +352,6 @@ $(function () {
             completeArr.push(taskObj);
         }
         localStorage.setItem("complete", JSON.stringify(completeArr));
-        //console.log(localStorage);
     };
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.

@@ -149,11 +149,11 @@ $(()=>{
 
     // Function that will invoked the hidePriorityViewToggleBtn function if the todolist > 0 ;
     const checkForPriorityLabeledTask = () =>{
-       if(todoListUl.childElementCount > 0){
-           hidePriorityViewToggleBtn(todoListUl);
-       }else if(completeListUl.childElementCount > 0){
-           hidePriorityViewToggleBtn(completeListUl);
-       }
+        if(todoListUl.childElementCount > 0){
+            hidePriorityViewToggleBtn(todoListUl);
+        }else if(completeListUl.childElementCount > 0){
+            hidePriorityViewToggleBtn(completeListUl);
+        }
     };
 
     // Function that will remove task from the todolistUl and moves it to the completedListUl and invoke hidePriorityBtn function.
@@ -165,15 +165,15 @@ $(()=>{
 
         if(parent.getAttribute("id") !== "completedListUl"){
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
+            prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
             hidePriorityBtn(e);
-            prepToStoreCompletedList(completeListUl)
         } else {
             todoListUl.appendChild(item);
             item.style.textDecoration = "";
-            item.children[1].textContent = `Created on: ${getDate()}`;
+            //item.children[1].textContent = `Created on: ${getDate()}`;
             displayPriorityBtn(e);
             item.classList.remove("complete");
-            prepToStoreTodoList(todoListUl);
         }
     };
 
@@ -297,18 +297,17 @@ $(()=>{
     // whenever one of them is >= 0.
     let prepToStoreTodoList = (todoListUl) => {
         let todoList_Items = document.querySelectorAll("#todolistUl li");
+        console.log(todoList_Items);
 
         if(todoList_Items.length >= 0){
             loopTodoListAndStore(todoListUl, todoList_Items);
         }
     };
 
-
     // This function loops the lists and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
     let loopTodoListAndStore = (list_Ul, list_Items) => {
-        let todoArr = [];
-        let paragraph, span, priorityLevel;
+        let todoArr = [], paragraph, span, priorityLevel;
 
         for(let i = 0; i < list_Items.length; i++) {
             paragraph = list_Items[i].childNodes[0].textContent;
@@ -318,12 +317,12 @@ $(()=>{
             todoArr.push(taskObj);
         }
         localStorage.setItem("todo",JSON.stringify(todoArr));
-        //console.log(localStorage);
     };
 
 
     let prepToStoreCompletedList = (completedListUl) => {
         let completedList_Items = document.querySelectorAll("#completedListUl li");
+        console.log(completedList_Items);
 
         if(completedList_Items.length >= 0){
             loopCompletedListAndStore(completedListUl, completedList_Items);
@@ -331,8 +330,7 @@ $(()=>{
     };
 
     let loopCompletedListAndStore = (list_Ul, list_Items) => {
-        let completeArr = [];
-        let paragraph, span, priorityLevel, completeClass;
+        let completeArr = [], paragraph, span, priorityLevel, completeClass;
 
         for(let i = 0; i < list_Items.length; i++) {
             paragraph = list_Items[i].childNodes[0].textContent;
@@ -347,9 +345,7 @@ $(()=>{
             completeArr.push(taskObj);
         }
         localStorage.setItem("complete",JSON.stringify(completeArr));
-        //console.log(localStorage);
     };
-
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
     // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems
@@ -358,19 +354,19 @@ $(()=>{
 
         if(localStorage.length > 0){
 
-           if(JSON.parse(localStorage.getItem("todo")).length > 0) {
-               let todoStorage   = JSON.parse(localStorage.getItem("todo"));
-               for(let i = 0; i < todoStorage.length; i++) {
-                   addItem(todoStorage[i].pTag, todoStorage[i].spanTag, todoStorage[i].taskUrgency);
-               }
-           }
+            if(JSON.parse(localStorage.getItem("todo")).length > 0) {
+                let todoStorage   = JSON.parse(localStorage.getItem("todo"));
+                for(let i = 0; i < todoStorage.length; i++) {
+                    addItem(todoStorage[i].pTag, todoStorage[i].spanTag, todoStorage[i].taskUrgency);
+                }
+            }
 
-           if(JSON.parse(localStorage.getItem("complete")).length > 0){
-               let completeStorage   = JSON.parse(localStorage.getItem("complete"));
-               for(let i = 0; i < completeStorage.length; i++) {
-                   addItem(completeStorage[i].pTag, completeStorage[i].spanTag, completeStorage[i].taskUrgency, completeStorage[i].completeClass);
-               }
-           }
+            if(JSON.parse(localStorage.getItem("complete")).length > 0){
+                let completeStorage   = JSON.parse(localStorage.getItem("complete"));
+                for(let i = 0; i < completeStorage.length; i++) {
+                    addItem(completeStorage[i].pTag, completeStorage[i].spanTag, completeStorage[i].taskUrgency, completeStorage[i].completeClass);
+                }
+            }
         }
         console.log(localStorage);
     })();
