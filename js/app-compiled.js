@@ -57,7 +57,7 @@ $(function () {
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
             hidePriorityViewToggleBtn(todoListUl);
-            prepToStore(todoListUl, completeListUl);
+            prepToStoreTodoList(todoListUl);
         } else {
             priorityItem(item);
         }
@@ -71,7 +71,7 @@ $(function () {
         var parent = item.parentNode;
         item.parentNode.insertBefore(item, parent.childNodes[0]);
         showPriorityViewToggleBtn();
-        prepToStore(todoListUl, completeListUl);
+        prepToStoreTodoList(todoListUl);
     };
 
     // This function will show the priority button that will change view to only show tasks labeled
@@ -144,7 +144,8 @@ $(function () {
         var parent = item.parentNode;
         parent.removeChild(item);
         checkForPriorityLabeledTask();
-        prepToStore(todoListUl, completeListUl);
+        prepToStoreTodoList(todoListUl);
+        prepToStoreCompletedList(completeListUl);
     };
 
     // Function that will invoked the hidePriorityViewToggleBtn function if the todolist > 0 ;
@@ -156,7 +157,7 @@ $(function () {
         }
     };
 
-    // Function that will remove task from the todolist and moves it to the completedtaskList and invoke hidePriorityBtn function.
+    // Function that will remove task from the todolistUl and moves it to the completedListUl and invoke hidePriorityBtn function.
     var completedItem = function completedItem(e) {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
@@ -166,12 +167,14 @@ $(function () {
         if (parent.getAttribute("id") !== "completedListUl") {
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
             hidePriorityBtn(e);
+            prepToStoreCompletedList(completeListUl);
         } else {
             todoListUl.appendChild(item);
             item.style.textDecoration = "";
             item.children[1].textContent = "Created on: " + getDate();
             displayPriorityBtn(e);
             item.classList.remove("complete");
+            prepToStoreTodoList(todoListUl);
         }
     };
 
@@ -200,7 +203,7 @@ $(function () {
 
     // Function that will add task to the todolist. The parameter passed to the function is received from the addBtn eventlistener
     // or from the getStorageItem IIFE.
-    var addItem = function addItem(text, spanTag, dataAttr) {
+    var addItem = function addItem(text, spanTag, dataAttr, classAttr) {
 
         // Creates an li element and set the id attribute
         var item = document.createElement("li");
@@ -262,9 +265,9 @@ $(function () {
         // Adds an click event listener to the complete button.
         completeBtn.addEventListener("click", completedItem);
 
-        // Checks if input value and if true, invokes prepToStore function.
+        // Checks if input value and if true, invokes prepToStoreTodoList function.
         if (input.value !== "") {
-            prepToStore(todoListUl, completeListUl);
+            prepToStoreTodoList(todoListUl);
         }
 
         // This if statement only executes when the IIFE (getStorageItems) runs and return the task(s) stored in the localStorage
@@ -274,35 +277,37 @@ $(function () {
             showPriorityViewToggleBtn();
         }
 
+        if (classAttr == "complete") {
+            completeListUl.appendChild(item);
+        }
+
         // Clears the input field after task is added to the list
         input.value = "";
     };
 
     // Object constructor template that converts each task in the list(s) in an object.
-    // This function will be invoked in the loopTaskListsAndStore function to store the list.
-    function CreateTasksObj(pTag, span, priorityLevel) {
+    // This function will be invoked in the loopListAndStore function to store the list.
+    function CreateTasksObj(pTag, span, priorityLevel, classAttr) {
         this.pTag = pTag;
         this.spanTag = span;
-        this.priority = priorityLevel;
+        this.taskUrgency = priorityLevel;
+        this.completeClass = classAttr;
     }
 
-    // This function gets the child elements of both the todolistUL and the completedlistUl and calls the loopTasksLists function
+    // This function gets the child elements of the todolistUL and calls the loopTasksLists function
     // whenever one of them is >= 0.
-    var prepToStore = function prepToStore(todoListUl, completedListUl) {
+    var prepToStoreTodoList = function prepToStoreTodoList(todoListUl) {
         var todoList_Items = document.querySelectorAll("#todolistUl li");
-        var completedlist_Items = document.querySelectorAll("#completedListUl li");
 
-        if (todoListUl.childElementCount >= 0) {
-            loopTaskListsAndStore(todoListUl, todoList_Items);
-        } else if (completedListUl.childElementCount >= 0) {
-            loopTaskListsAndStore(completedListUl, completedlist_Items);
+        if (todoList_Items.length >= 0) {
+            loopTodoListAndStore(todoListUl, todoList_Items);
         }
     };
 
-    // This function loops the todolist and creates an object of each child element(task), stringify them and store
+    // This function loops the lists and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
-    var loopTaskListsAndStore = function loopTaskListsAndStore(list_Ul, list_Items) {
-        var taskArr = [];
+    var loopTodoListAndStore = function loopTodoListAndStore(list_Ul, list_Items) {
+        var todoArr = [];
         var paragraph = void 0,
             span = void 0,
             priorityLevel = void 0;
@@ -312,26 +317,65 @@ $(function () {
             span = list_Items[i].childNodes[1].textContent;
             priorityLevel = list_Ul.children[i].getAttribute("data-level");
             var taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
-            taskArr.push(taskObj);
+            todoArr.push(taskObj);
         }
-        localStorage.setItem("tasks", JSON.stringify(taskArr));
-        console.log(localStorage);
+        localStorage.setItem("todo", JSON.stringify(todoArr));
+        //console.log(localStorage);
+    };
+
+    var prepToStoreCompletedList = function prepToStoreCompletedList(completedListUl) {
+        var completedList_Items = document.querySelectorAll("#completedListUl li");
+
+        if (completedList_Items.length >= 0) {
+            loopCompletedListAndStore(completedListUl, completedList_Items);
+        }
+    };
+
+    var loopCompletedListAndStore = function loopCompletedListAndStore(list_Ul, list_Items) {
+        var completeArr = [];
+        var paragraph = void 0,
+            span = void 0,
+            priorityLevel = void 0,
+            completeClass = void 0;
+
+        for (var i = 0; i < list_Items.length; i++) {
+            paragraph = list_Items[i].childNodes[0].textContent;
+            span = list_Items[i].childNodes[1].textContent;
+            priorityLevel = list_Ul.children[i].getAttribute("data-level");
+
+            if (list_Ul.children[i].classList.contains("complete")) {
+                completeClass = "complete";
+            }
+
+            var taskObj = new CreateTasksObj(paragraph, span, priorityLevel, completeClass);
+            completeArr.push(taskObj);
+        }
+        localStorage.setItem("complete", JSON.stringify(completeArr));
+        //console.log(localStorage);
     };
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
     // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems
     // function to render the tasks in the document(DOM).
     (function getStorageItems() {
-        console.log(localStorage);
 
         if (localStorage.length > 0) {
-            var storage = JSON.parse(localStorage.getItem("tasks"));
-            var storageLength = storage.length;
 
-            for (var i = 0; i < storageLength; i++) {
-                addItem(storage[i].pTag, storage[i].spanTag, storage[i].priority, storage[i].class);
+            if (JSON.parse(localStorage.getItem("todo")).length > 0) {
+                var todoStorage = JSON.parse(localStorage.getItem("todo"));
+                for (var i = 0; i < todoStorage.length; i++) {
+                    addItem(todoStorage[i].pTag, todoStorage[i].spanTag, todoStorage[i].taskUrgency);
+                }
+            }
+
+            if (JSON.parse(localStorage.getItem("complete")).length > 0) {
+                var completeStorage = JSON.parse(localStorage.getItem("complete"));
+                for (var _i = 0; _i < completeStorage.length; _i++) {
+                    addItem(completeStorage[_i].pTag, completeStorage[_i].spanTag, completeStorage[_i].taskUrgency, completeStorage[_i].completeClass);
+                }
             }
         }
+        console.log(localStorage);
     })();
 
     // Event listener for searching specific tasks in the todolist and the completedtaskList
