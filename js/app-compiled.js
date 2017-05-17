@@ -94,6 +94,9 @@ $(function () {
             }
         }
 
+        // hides the entire completed list
+        completeListUl.style.display = "none";
+
         // Changes the text of the button when in priority view.
         priorityListBtn.textContent = "View All";
 
@@ -116,6 +119,9 @@ $(function () {
 
         // Adds event listener back to the PriorityList button which completes the Toggle function of the button.
         priorityListBtn.addEventListener("click", showPriorityLabeledItems);
+
+        // Displays the entire completed list
+        completeListUl.style.display = "";
     };
 
     // This function will hide the priority button that will show only tasks labeled as priority. (if there is NO task with priority label).
@@ -162,19 +168,20 @@ $(function () {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
         item.children[1].textContent = "Completed on: " + getDate();
-        item.classList.add("complete");
 
         if (parent.getAttribute("id") !== "completedListUl") {
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
+            item.classList.add("complete");
             prepToStoreCompletedList(completeListUl);
             prepToStoreTodoList(todoListUl);
             hidePriorityBtn(e);
         } else {
-            todoListUl.appendChild(item);
-            item.style.textDecoration = "";
-            //item.children[1].textContent = `Created on: ${getDate()}`;
-            displayPriorityBtn(e);
+            todoListUl.insertBefore(parent.removeChild(item), todoListUl.childNodes[0]);
             item.classList.remove("complete");
+            prepToStoreTodoList(todoListUl);
+            prepToStoreCompletedList(completeListUl);
+            item.style.textDecoration = "";
+            displayPriorityBtn(e);
         }
     };
 
@@ -217,7 +224,7 @@ $(function () {
 
         // Creates the Date indicator and appends it to the li element.
         var dateSpan = document.createElement("span");
-        var dateNode = document.createTextNode("Created on: " + getDate() || spanTag);
+        var dateNode = document.createTextNode("Created on: " + getDate());
         dateSpan.appendChild(dateNode);
         dateSpan.className = "dateSpan";
         item.appendChild(dateSpan);
@@ -271,7 +278,7 @@ $(function () {
         }
 
         // This if statement only executes when the IIFE (getStorageItems) runs and return the task(s) stored in the localStorage
-        if (dataAttr == "priority") {
+        if (dataAttr == "priority" && classAttr !== "complete") {
             item.setAttribute("data-level", "priority");
             item.classList.add("priority-item");
             showPriorityViewToggleBtn();
