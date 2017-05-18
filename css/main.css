@@ -24,8 +24,8 @@ li {
     padding: 20px;
     box-shadow: 0 3px 3px #d3d3d3;
 }
-.dateSpan {
-
+#todoListUl li .dateSpan {
+    display: none;
 }
 .buttonsDiv {
     /*position: absolute;*/
