@@ -12,8 +12,9 @@
 // Search should ignore case-sensitivity.
 // Integrate Web Storage API to save data in the Storage object(localStorage).
 //Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
+//Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
 
-//TODO Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
+//TODO The priorityBtn of tasks in completedListUl should not be displayed when page is refresh/reloaded.
 //TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
@@ -50,7 +51,7 @@ $(function () {
 
     // This function will check if item has the data-level attr when a user triggers the event(priorityBtn).
     // If true, it will be removed and invoke hidePriorityToggleBtn.
-    // If false, priorityItem function will be invoked
+    // If false, markAsPriority function will be invoked
     var checkPriorityLevel = function checkPriorityLevel(e) {
         var item = e.target.parentNode.parentNode;
         if (item.getAttribute("data-level") === "priority") {
@@ -59,13 +60,13 @@ $(function () {
             hidePriorityToggleBtn(todoListUl);
             prepToStoreTodoList(todoListUl);
         } else {
-            priorityItem(item);
+            markAsPriority(item);
         }
     };
 
     // This function will apply data attr value of priority to the task and moves it
     // top off the todolist. Then applies specific CSS styles for task labeled as priority and invoke showPriorityViewToggleBtn.
-    var priorityItem = function priorityItem(item) {
+    var markAsPriority = function markAsPriority(item) {
         item.setAttribute("data-level", "priority");
         item.classList.add("priority-item");
         var parent = item.parentNode;
@@ -281,6 +282,7 @@ $(function () {
         if (classAttr == "complete") {
             completeListUl.appendChild(item);
             hidePriorityToggleBtn(todoListUl);
+            priorityBtn.style.display = "none";
         }
 
         // Clears the input field after task is added to the list
@@ -302,13 +304,13 @@ $(function () {
         var todoList_Items = document.querySelectorAll("#todolistUl li");
 
         if (todoList_Items.length >= 0) {
-            loopTodoListAndStore(todoListUl, todoList_Items);
+            loopTodoListAndSave(todoListUl, todoList_Items);
         }
     };
 
     // This function loops the lists and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
-    var loopTodoListAndStore = function loopTodoListAndStore(list_Ul, list_Items) {
+    var loopTodoListAndSave = function loopTodoListAndSave(list_Ul, list_Items) {
         var todoArr = [],
             paragraph = void 0,
             span = void 0,
@@ -328,11 +330,11 @@ $(function () {
         var completedList_Items = document.querySelectorAll("#completedListUl li");
 
         if (completedList_Items.length >= 0) {
-            loopCompletedListAndStore(completedListUl, completedList_Items);
+            loopCompletedListAndSave(completedListUl, completedList_Items);
         }
     };
 
-    var loopCompletedListAndStore = function loopCompletedListAndStore(list_Ul, list_Items) {
+    var loopCompletedListAndSave = function loopCompletedListAndSave(list_Ul, list_Items) {
         var completeArr = [],
             paragraph = void 0,
             span = void 0,
