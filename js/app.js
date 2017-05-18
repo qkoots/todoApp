@@ -6,15 +6,13 @@
 // Add item to task list by pressing enterKey.
 // View option to only see the priority items.
 // Empty input form after items has been added.
-// Display date when task was send to completed list.
 // integrate search method to search for specific items.
 // Search should ignore case-sensitivity.
 // Integrate Web Storage API to save data in the Storage object(localStorage).
-//Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
-//Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
+// Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
+// Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
+// The priorityBtn of tasks in completedListUl should not be displayed when page is refresh/reloaded.
 
-//TODO The priorityBtn of tasks in completedListUl should not be displayed when page is refresh/reloaded.
-//TODO button the Clear all tasks. The user should confirm this action before the program runs the function.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
 //TODO Replace icons using font awesome icons.
@@ -26,7 +24,7 @@ $(()=>{
 
     // Saving the DOM elements in a variables
     let addBtn =  document.getElementById("addBtn");
-    let todoListUl = document.getElementById("todolistUl");
+    let todoListUl = document.getElementById("todoListUl");
     let completeListUl = document.getElementById("completedListUl");
     let input = document.getElementById("userInput");
     const priorityListToggleBtn = document.getElementById("priorityListBtn");
@@ -71,7 +69,7 @@ $(()=>{
         let parent = item.parentNode;
         item.parentNode.insertBefore(item,parent.childNodes[0]);
         showPriorityViewToggleBtn();
-        prepToStoreTodoList(todoListUl);
+        prepToSaveTodoListUl(todoListUl);
     };
 
     // This function will show the priorityListToggleBtn that will only show tasks labeled
@@ -105,7 +103,7 @@ $(()=>{
         priorityListToggleBtn.addEventListener("click",showAllItems);
     };
 
-    // This function will display all tasks in the todolistUl(Priority + normal tasks).
+    // This function will display all tasks in the todoListUl(Priority + normal tasks).
     const showAllItems = () => {
         for(let i = 0 ; i < todoListUl.children.length; i++) {
             if(todoListUl.children[i].getAttribute("data-level") === null) {
@@ -144,7 +142,7 @@ $(()=>{
         }
     };
 
-    // Function that will delete the task from the todolistUl and/or completedListUl.
+    // Function that will delete the task from the todoListUl and/or completedListUl.
     const deleteItem = e => {
         let item = e.target.parentNode.parentNode;
         let parent = item.parentNode;
@@ -156,11 +154,11 @@ $(()=>{
         prepToStoreCompletedList(completeListUl);
     };
 
-    // Function that will remove task from the todolistUl and moves it to the completedListUl and invoke hidePriorityBtn function.
+    // Function that will remove task from the todoListUl and moves it to the completedListUl and invoke hidePriorityBtn function.
     const completedItem = e => {
         let item = e.target.parentNode.parentNode;
         let parent = item.parentNode;
-        item.children[1].textContent = `Completed on: ${getDate()}`;
+        //item.children[1].textContent = `Completed on: ${getDate()}`;
 
         if(parent.getAttribute("id") !== "completedListUl"){
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
@@ -205,7 +203,7 @@ $(()=>{
 
     // Function that will add task to the todoListUl. The parameter passed to the function is received from the addBtn event listener
     // or from the getStorageItem IIFE.
-    let addItem = (text ,spanTag, dataAttr, classAttr) =>{
+    let addItem = (text ,date, dataAttr, classAttr) =>{
 
         // Creates an li element and set the id attribute
         const item = document.createElement("li");
@@ -219,12 +217,12 @@ $(()=>{
 
         // Creates the Date indicator and appends it to the li element.
         const dateSpan = document.createElement("span");
-        const dateNode = document.createTextNode("Created on: "+ getDate());
+        const dateNode = document.createTextNode("Completed on: " + date);
         dateSpan.appendChild(dateNode);
         dateSpan.className = "dateSpan";
         item.appendChild(dateSpan);
 
-        // Creates a Div element for the remove and complete buttons for every task in the todolistUl.
+        // Creates a Div element for the remove and complete buttons for every task in the todoListUl.
         const buttonsDiv     = document.createElement("div");
         buttonsDiv.className = "buttonsDiv";
 
@@ -255,7 +253,7 @@ $(()=>{
         // Appends the buttonDiv element to the li element.
         item.appendChild(buttonsDiv);
 
-        // Insert the li element into the DOM ul element with id of #todolistUl.
+        // Insert the li element into the DOM ul element with id of #todoListUl.
         todoListUl.insertBefore(item,todoListUl.childNodes[0]);
 
         // Adds an click event listener to the priority button.
@@ -291,9 +289,9 @@ $(()=>{
 
     // Object constructor template that converts each task in the list(s) in an object.
     // This function will be invoked in the loopListAndStore function to store the list.
-    function CreateTasksObj(pTag, span, priorityLevel, classAttr){
+    function CreateTasksObj(pTag, date, priorityLevel, classAttr){
         this.pTag = pTag;
-        this.spanTag = span;
+        this.taskDate = date;
         this.taskUrgency = priorityLevel;
         this.completeClass = classAttr;
     }
@@ -301,7 +299,7 @@ $(()=>{
     // This function gets the child elements of the todolistUL and calls the loopTasksLists function
     // whenever one of them is >= 0.
     let prepToSaveTodoListUl = (todoListUl) => {
-        let todoList_Items = document.querySelectorAll("#todolistUl li");
+        let todoList_Items = document.querySelectorAll("#todoListUl li");
 
         if(todoList_Items.length >= 0){
             loopTodoListAndSave(todoListUl, todoList_Items);
@@ -311,13 +309,13 @@ $(()=>{
     // This function loops the lists and creates an object of each child element(task), stringify them and store
     // them in the browsers localStorage object using the Web Storage API.
     let loopTodoListAndSave = (list_Ul, list_Items) => {
-        let todoArr = [], paragraph, span, priorityLevel;
+        let todoArr = [], paragraph, dateCreated, priorityLevel;
 
         for(let i = 0; i < list_Items.length; i++) {
             paragraph = list_Items[i].childNodes[0].textContent;
-            span = list_Items[i].childNodes[1].textContent;
+            dateCreated = getDate();
             priorityLevel = list_Ul.children[i].getAttribute("data-level");
-            let taskObj = new CreateTasksObj(paragraph, span, priorityLevel);
+            let taskObj = new CreateTasksObj(paragraph, dateCreated, priorityLevel);
             todoArr.push(taskObj);
         }
         localStorage.setItem("todo",JSON.stringify(todoArr));
@@ -332,19 +330,20 @@ $(()=>{
     };
 
     let loopCompletedListAndSave = (list_Ul, list_Items) => {
-        let completeArr = [], paragraph, span, priorityLevel, completeClass;
+        let completeArr = [], paragraph, dateCompleted, priorityLevel, completeClass;
 
         for(let i = 0; i < list_Items.length; i++) {
             paragraph     = list_Items[i].childNodes[0].textContent;
-            span = list_Items[i].childNodes[1].textContent;
+            dateCompleted = getDate();
             priorityLevel = list_Ul.children[i].getAttribute("data-level");
             completeClass = "complete";
 
-            let taskObj = new CreateTasksObj(paragraph, span, priorityLevel, completeClass);
+            let taskObj = new CreateTasksObj(paragraph, dateCompleted, priorityLevel, completeClass);
             completeArr.push(taskObj);
         }
 
         localStorage.setItem("complete",JSON.stringify(completeArr));
+        console.log(localStorage);
     };
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
@@ -356,14 +355,14 @@ $(()=>{
             if(JSON.parse(localStorage.getItem("todo")).length > 0) {
                 let todoStorage   = JSON.parse(localStorage.getItem("todo"));
                 for(let i = 0; i < todoStorage.length; i++) {
-                    addItem(todoStorage[i].pTag, todoStorage[i].spanTag, todoStorage[i].taskUrgency);
+                    addItem(todoStorage[i].pTag, todoStorage[i].taskDate, todoStorage[i].taskUrgency);
                 }
             }
 
             if(JSON.parse(localStorage.getItem("complete")).length > 0){
                 let completeStorage   = JSON.parse(localStorage.getItem("complete"));
                 for(let i = 0; i < completeStorage.length; i++) {
-                    addItem(completeStorage[i].pTag, completeStorage[i].spanTag, completeStorage[i].taskUrgency, completeStorage[i].completeClass);
+                    addItem(completeStorage[i].pTag, completeStorage[i].taskDate, completeStorage[i].taskUrgency, completeStorage[i].completeClass);
                 }
             }
         }
