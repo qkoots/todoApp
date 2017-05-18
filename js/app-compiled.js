@@ -134,11 +134,12 @@ $(function () {
             if (list.children[i].getAttribute("data-level") !== null) {
                 count++;
             }
-            if (count >= 1) {
-                priorityListToggleBtn.style.display = "inline-block";
-            } else {
-                priorityListToggleBtn.style.display = "none";
-            }
+        }
+
+        if (count >= 1) {
+            priorityListToggleBtn.style.display = "inline-block";
+        } else {
+            priorityListToggleBtn.style.display = "none";
         }
     };
 

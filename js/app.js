@@ -81,7 +81,7 @@ $(()=>{
                 priorityListToggleBtn.style.display = "inline-block";
             }
 
-    }
+        }
         // Add event listener to the priorityListToggleBtn so showPriorityLabeledItems function can be invoked if button is clicked.
         priorityListToggleBtn.addEventListener("click",showPriorityLabeledItems);
     };
@@ -134,11 +134,12 @@ $(()=>{
             if(list.children[i].getAttribute("data-level") !== null){
                 count++;
             }
-            if(count >= 1) {
-                priorityListToggleBtn.style.display = "inline-block";
-            }else {
-                priorityListToggleBtn.style.display = "none";
-            }
+        }
+
+        if(count >= 1) {
+            priorityListToggleBtn.style.display = "inline-block";
+        }else {
+            priorityListToggleBtn.style.display = "none";
         }
     };
 
@@ -194,8 +195,8 @@ $(()=>{
         priorityBtn.style.display = "none";
     };
 
-     //Function that gets the current date.
-        const getDate = () => {
+    //Function that gets the current date.
+    const getDate = () => {
         const date     = new Date();
         let getDate  = date.toDateString();
         return getDate;
@@ -319,7 +320,6 @@ $(()=>{
         }
         localStorage.setItem("todo",JSON.stringify(todoArr));
     };
-
 
     let prepToStoreCompletedList = (completedListUl) => {
         let completedList_Items = document.querySelectorAll("#completedListUl li");
