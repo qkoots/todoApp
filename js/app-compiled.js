@@ -58,14 +58,14 @@ $(function () {
             item.removeAttribute("data-level");
             item.classList.remove("priority-item");
             hidePriorityToggleBtn(todoListUl);
-            prepToStoreTodoList(todoListUl);
+            prepToSaveTodoListUl(todoListUl);
         } else {
             markAsPriority(item);
         }
     };
 
-    // This function will apply data attr value of priority to the task and moves it
-    // top off the todolist. Then applies specific CSS styles for task labeled as priority and invoke showPriorityViewToggleBtn.
+    // This function will apply data attr value of priority to the task and moves it to
+    // top of the todoListUl. Then applies specific CSS styles for task labeled as priority and invoke showPriorityViewToggleBtn.
     var markAsPriority = function markAsPriority(item) {
         item.setAttribute("data-level", "priority");
         item.classList.add("priority-item");
@@ -76,7 +76,7 @@ $(function () {
     };
 
     // This function will show the priorityListToggleBtn that will only show tasks labeled
-    // as priority (if there is 1 or more task with labeled as priority) and adds an event listener to the button.
+    // as priority (if there is 1 or more task with labeled as priority) and adds an event listener to the priorityListToggleBtn.
     var showPriorityViewToggleBtn = function showPriorityViewToggleBtn() {
         for (var i = 0; i < todoListUl.children.length; i++) {
             if (todoListUl.children[i].getAttribute("data-level") === "priority") {
@@ -95,33 +95,33 @@ $(function () {
                 todoListUl.children[i].style.display = "none";
             }
         }
-        // hides the entire completed list
+        // Hides the entire completedListUl.
         completeListUl.style.display = "none";
 
-        // Changes the text of the button when in priority view.
+        // Changes the text of the priorityListToggleBtn when in priority view mode.
         priorityListToggleBtn.textContent = "View All";
 
-        // Add event listener to the priorityListToggleBtn so showAlltems function can be invoked if button is clicked.
+        // Add event listener to the priorityListToggleBtn so the showAllItems function can be invoked when event is triggered.
         priorityListToggleBtn.addEventListener("click", showAllItems);
     };
 
-    // This function will display all task in the todolistUl(normal state).
+    // This function will display all tasks in the todolistUl(Priority + normal tasks).
     var showAllItems = function showAllItems() {
         for (var i = 0; i < todoListUl.children.length; i++) {
             if (todoListUl.children[i].getAttribute("data-level") === null) {
                 todoListUl.children[i].style.display = "";
             }
         }
-        // Changes the text of the button when all tasks are displayed.
+        // Changes the text of the priorityListToggleBtn when all tasks are displayed.
         priorityListToggleBtn.textContent = "Priorities";
 
-        // Remove the event listener from the button
+        // Remove the event listener from the priorityListToggleBtn
         priorityListToggleBtn.removeEventListener("click", showAllItems);
 
-        // Adds event listener back to the PriorityList button which completes the Toggle function of the button.
+        // Adds event listener back to the priorityListToggleBtn which completes the Toggle function of the button.
         priorityListToggleBtn.addEventListener("click", showPriorityLabeledItems);
 
-        // Displays the entire completed list
+        // Displays the entire completedListUl.
         completeListUl.style.display = "";
     };
 
@@ -144,7 +144,7 @@ $(function () {
         }
     };
 
-    // Function that will delete the task from the todolistUl/completedListUl.
+    // Function that will delete the task from the todolistUl and/or completedListUl.
     var deleteItem = function deleteItem(e) {
         var item = e.target.parentNode.parentNode;
         var parent = item.parentNode;
@@ -152,7 +152,7 @@ $(function () {
 
         hidePriorityToggleBtn(todoListUl);
 
-        prepToStoreTodoList(todoListUl);
+        prepToSaveTodoListUl(todoListUl);
         prepToStoreCompletedList(completeListUl);
     };
 
@@ -167,20 +167,20 @@ $(function () {
             item.classList.add("complete");
             hidePriorityBtn(e);
             prepToStoreCompletedList(completeListUl);
-            prepToStoreTodoList(todoListUl);
+            prepToSaveTodoListUl(todoListUl);
         } else {
             todoListUl.appendChild(item);
             item.classList.remove("complete");
             item.style.textDecoration = "";
             displayPriorityBtn(e);
-            prepToStoreTodoList(todoListUl);
+            prepToSaveTodoListUl(todoListUl);
             prepToStoreCompletedList(completeListUl);
         }
 
         hidePriorityToggleBtn(todoListUl);
     };
 
-    // Function will display the priority button when task is moved back from "completedtaskList" to the todolist.
+    // Function will display the priority button when task is moved back from "completedListUl" to the todoListUl.
     var displayPriorityBtn = function displayPriorityBtn(e) {
         var item = e.target.parentNode;
         var parent = item.parentNode;
@@ -188,7 +188,7 @@ $(function () {
         priorityBtn.style.display = "inline-block";
     };
 
-    // Function will hide the priority button when task is moved to the completedtasklist.
+    // Function will hide the priority button when task is moved to the completedlistUl.
     var hidePriorityBtn = function hidePriorityBtn(e) {
         var item = e.target.parentNode;
         var parent = item.parentNode;
@@ -203,7 +203,7 @@ $(function () {
         return getDate;
     };
 
-    // Function that will add task to the todolist. The parameter passed to the function is received from the addBtn eventlistener
+    // Function that will add task to the todoListUl. The parameter passed to the function is received from the addBtn event listener
     // or from the getStorageItem IIFE.
     var addItem = function addItem(text, spanTag, dataAttr, classAttr) {
 
@@ -224,7 +224,7 @@ $(function () {
         dateSpan.className = "dateSpan";
         item.appendChild(dateSpan);
 
-        // Creates a Div element for the remove and complete buttons for every task in the todolist.
+        // Creates a Div element for the remove and complete buttons for every task in the todolistUl.
         var buttonsDiv = document.createElement("div");
         buttonsDiv.className = "buttonsDiv";
 
@@ -236,7 +236,7 @@ $(function () {
         priorityBtn.appendChild(priorityBtnNode);
         buttonsDiv.appendChild(priorityBtn);
 
-        // Creates the remove button to remove tasks from the todolist. Button will be appended as a child to the buttonDiv element.
+        // Creates the remove button to remove tasks from the todoListUl. Button will be appended as a child to the buttonDiv element.
         var removeBtn = document.createElement("button");
         var removeBtnNode = document.createTextNode("X");
         removeBtn.classList.add("btn", "btn-danger");
@@ -267,19 +267,19 @@ $(function () {
         // Adds an click event listener to the complete button.
         completeBtn.addEventListener("click", completedItem);
 
-        // Checks if input value and if true, invokes prepToStoreTodoList function.
+        // Checks if input value and if true, invokes prepToSaveTodoListUl function.
         if (input.value !== "") {
-            prepToStoreTodoList(todoListUl);
+            prepToSaveTodoListUl(todoListUl);
         }
 
         // This if statement only executes when the IIFE (getStorageItems) runs and return the task(s) stored in the localStorage
-        if (dataAttr == "priority") {
+        if (dataAttr === "priority") {
             item.setAttribute("data-level", "priority");
             item.classList.add("priority-item");
             showPriorityViewToggleBtn();
         }
 
-        if (classAttr == "complete") {
+        if (classAttr === "complete") {
             completeListUl.appendChild(item);
             hidePriorityToggleBtn(todoListUl);
             priorityBtn.style.display = "none";
@@ -300,7 +300,7 @@ $(function () {
 
     // This function gets the child elements of the todolistUL and calls the loopTasksLists function
     // whenever one of them is >= 0.
-    var prepToStoreTodoList = function prepToStoreTodoList(todoListUl) {
+    var prepToSaveTodoListUl = function prepToSaveTodoListUl(todoListUl) {
         var todoList_Items = document.querySelectorAll("#todolistUl li");
 
         if (todoList_Items.length >= 0) {
@@ -376,7 +376,7 @@ $(function () {
         }
     })();
 
-    // Event listener for searching specific tasks in the todolist and the completedtaskList
+    // Event listener for searching specific tasks in the todoListUl and the completedListUl
     searchFieldInput.addEventListener("keyup", function () {
         searchTask(todoListUl);
         searchTask(completeListUl);
