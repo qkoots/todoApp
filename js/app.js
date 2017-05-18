@@ -77,10 +77,11 @@ $(()=>{
     // as priority (if there is 1 or more task with labeled as priority).
     const showPriorityViewToggleBtn = () => {
         for(let i = 0 ; i < todoListUl.children.length; i++) {
-            if(todoListUl.children[i].getAttribute("data-level") === "priority"){
+            if(todoListUl.children[i].getAttribute("data-level") === "priority") {
                 priorityListBtn.style.display = "inline-block";
             }
-        }
+
+    }
         // Add event listener to the priorityListBtn so showPriorityLabeledItems function can be invoked if button is clicked.
         priorityListBtn.addEventListener("click",showPriorityLabeledItems);
     };
@@ -90,7 +91,6 @@ $(()=>{
         for(let i = 0 ; i < todoListUl.children.length; i++) {
             if(todoListUl.children[i].getAttribute("data-level") === null) {
                 todoListUl.children[i].style.display = "none";
-
             }
         }
 
@@ -172,17 +172,19 @@ $(()=>{
         if(parent.getAttribute("id") !== "completedListUl"){
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
             item.classList.add("complete");
-            prepToStoreCompletedList(completeListUl);
-            prepToStoreTodoList(todoListUl);
             hidePriorityBtn(e);
-        }else {
-            todoListUl.insertBefore(parent.removeChild(item), todoListUl.childNodes[0]);
-            item.classList.remove("complete");
-            prepToStoreTodoList(todoListUl);
             prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
+        }else {
+            todoListUl.appendChild(item);
+            item.classList.remove("complete");
             item.style.textDecoration = "";
             displayPriorityBtn(e);
+            prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
         }
+
+        console.log(localStorage);
     };
 
     // Function will display the priority button when task is moved back from "completedtaskList" to the todolist.
@@ -201,8 +203,8 @@ $(()=>{
         priorityBtn.style.display = "none";
     };
 
-    // Function that gets the current date.
-    const getDate = () => {
+     //Function that gets the current date.
+        const getDate = () => {
         const date     = new Date();
         let getDate  = date.toDateString();
         return getDate;
@@ -305,7 +307,6 @@ $(()=>{
     // whenever one of them is >= 0.
     let prepToStoreTodoList = (todoListUl) => {
         let todoList_Items = document.querySelectorAll("#todolistUl li");
-        console.log(todoList_Items);
 
         if(todoList_Items.length >= 0){
             loopTodoListAndStore(todoListUl, todoList_Items);
@@ -330,7 +331,6 @@ $(()=>{
 
     let prepToStoreCompletedList = (completedListUl) => {
         let completedList_Items = document.querySelectorAll("#completedListUl li");
-        console.log(completedList_Items);
 
         if(completedList_Items.length >= 0){
             loopCompletedListAndStore(completedListUl, completedList_Items);
@@ -341,19 +341,17 @@ $(()=>{
         let completeArr = [], paragraph, span, priorityLevel, completeClass;
 
         for(let i = 0; i < list_Items.length; i++) {
-            paragraph = list_Items[i].childNodes[0].textContent;
+            paragraph     = list_Items[i].childNodes[0].textContent;
             span = list_Items[i].childNodes[1].textContent;
             priorityLevel = list_Ul.children[i].getAttribute("data-level");
-
-            if(list_Ul.children[i].classList.contains("complete")){
-                completeClass = "complete";
-            }
+            completeClass = "complete";
 
             let taskObj = new CreateTasksObj(paragraph, span, priorityLevel, completeClass);
             completeArr.push(taskObj);
         }
+
         localStorage.setItem("complete",JSON.stringify(completeArr));
-    };
+    }
 
     // This IIFE will check if there is any tasks stored in the LocalStorage object.
     // If true, it will parse the localStorage object, retrieve the values(tasks) and then invoke the addItems

@@ -172,17 +172,19 @@ $(function () {
         if (parent.getAttribute("id") !== "completedListUl") {
             completeListUl.insertBefore(parent.removeChild(item), completeListUl.childNodes[0]);
             item.classList.add("complete");
-            prepToStoreCompletedList(completeListUl);
-            prepToStoreTodoList(todoListUl);
             hidePriorityBtn(e);
-        } else {
-            todoListUl.insertBefore(parent.removeChild(item), todoListUl.childNodes[0]);
-            item.classList.remove("complete");
-            prepToStoreTodoList(todoListUl);
             prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
+        } else {
+            todoListUl.appendChild(item);
+            item.classList.remove("complete");
             item.style.textDecoration = "";
             displayPriorityBtn(e);
+            prepToStoreCompletedList(completeListUl);
+            prepToStoreTodoList(todoListUl);
         }
+
+        console.log(localStorage);
     };
 
     // Function will display the priority button when task is moved back from "completedtaskList" to the todolist.
@@ -201,7 +203,7 @@ $(function () {
         priorityBtn.style.display = "none";
     };
 
-    // Function that gets the current date.
+    //Function that gets the current date.
     var getDate = function getDate() {
         var date = new Date();
         var getDate = date.toDateString();
@@ -305,7 +307,6 @@ $(function () {
     // whenever one of them is >= 0.
     var prepToStoreTodoList = function prepToStoreTodoList(todoListUl) {
         var todoList_Items = document.querySelectorAll("#todolistUl li");
-        console.log(todoList_Items);
 
         if (todoList_Items.length >= 0) {
             loopTodoListAndStore(todoListUl, todoList_Items);
@@ -332,7 +333,6 @@ $(function () {
 
     var prepToStoreCompletedList = function prepToStoreCompletedList(completedListUl) {
         var completedList_Items = document.querySelectorAll("#completedListUl li");
-        console.log(completedList_Items);
 
         if (completedList_Items.length >= 0) {
             loopCompletedListAndStore(completedListUl, completedList_Items);
@@ -350,14 +350,12 @@ $(function () {
             paragraph = list_Items[i].childNodes[0].textContent;
             span = list_Items[i].childNodes[1].textContent;
             priorityLevel = list_Ul.children[i].getAttribute("data-level");
-
-            if (list_Ul.children[i].classList.contains("complete")) {
-                completeClass = "complete";
-            }
+            completeClass = "complete";
 
             var taskObj = new CreateTasksObj(paragraph, span, priorityLevel, completeClass);
             completeArr.push(taskObj);
         }
+
         localStorage.setItem("complete", JSON.stringify(completeArr));
     };
 
