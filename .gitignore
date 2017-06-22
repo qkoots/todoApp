@@ -8,6 +8,7 @@
 .idea/todoApp.iml
 .idea/watcherTasks.xml
 .idea/
+/node_modules
 
 
 # Sensitive or high-churn files:
