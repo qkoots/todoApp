@@ -3,12 +3,16 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/js/app-compiled.js" />
+        <item url="file://$PROJECT_DIR$/js/newApp-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/app-compiled.js" />
       <root url="file://$PROJECT_DIR$/app-compiled.js" />
+      <root url="file://$PROJECT_DIR$/js/searchTasks-compiled.js" />
+      <root url="file://$PROJECT_DIR$/js/date-compiled.js" />
       <root url="file://$PROJECT_DIR$/js/app-compiled.js" />
+      <root url="file://$PROJECT_DIR$/js/newApp-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>
