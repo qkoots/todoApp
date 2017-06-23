@@ -18,10 +18,6 @@
 //TODO Users should be able to sort tasks by date
 
 
-
-const displayTodosBtn = document.getElementById("displayTodosBtn");
-const toggleTodosBtn = document.getElementById("toggleTodosBtn");
-
 // Construct the todoList object
 const todoList = {
 
@@ -77,7 +73,6 @@ const todoList = {
                 completedTodos++
             }
         }
-
         if(completedTodos === totalTodos){
             for(let i = 0; i < totalTodos; i++){
                 this.todos[i].completed = false;
@@ -91,10 +86,22 @@ const todoList = {
     }
 };
 
-displayTodosBtn.addEventListener("click", () => {
-    todoList.displayTodos();
-});
-toggleTodosBtn.addEventListener("click", () => {
-    todoList.toggleAll();
-});
+// Handlers for the events the user triggers.
+const handlers = {
+
+    displayTodos() {
+        todoList.displayTodos();
+    },
+
+    toggleTodos() {
+        todoList.toggleAll();
+    },
+
+    addTodo() {
+        let addTodoInputValue = document.getElementById("addTodoValueInput");
+        todoList.addTodo(addTodoInputValue.value);
+        addTodoInputValue.value = "";
+    },
+
+};
 

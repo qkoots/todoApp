@@ -20,9 +20,6 @@
 //TODO Users should be able to sort tasks by date
 
 
-var displayTodosBtn = document.getElementById("displayTodosBtn");
-var toggleTodosBtn = document.getElementById("toggleTodosBtn");
-
 // Construct the todoList object
 var todoList = {
 
@@ -83,7 +80,6 @@ var todoList = {
                 completedTodos++;
             }
         }
-
         if (completedTodos === totalTodos) {
             for (var _i = 0; _i < totalTodos; _i++) {
                 this.todos[_i].completed = false;
@@ -97,11 +93,19 @@ var todoList = {
     }
 };
 
-displayTodosBtn.addEventListener("click", function () {
-    todoList.displayTodos();
-});
-toggleTodosBtn.addEventListener("click", function () {
-    todoList.toggleAll();
-});
+// Handlers for the events the user triggers.
+var handlers = {
+    displayTodos: function displayTodos() {
+        todoList.displayTodos();
+    },
+    toggleTodos: function toggleTodos() {
+        todoList.toggleAll();
+    },
+    addTodo: function addTodo() {
+        var addTodoInputValue = document.getElementById("addTodoValueInput");
+        todoList.addTodo(addTodoInputValue.value);
+        addTodoInputValue.value = "";
+    }
+};
 
 //# sourceMappingURL=app-compiled.js.map
