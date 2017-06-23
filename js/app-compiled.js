@@ -20,83 +20,88 @@
 //TODO Users should be able to sort tasks by date
 
 
-$(function () {
+var displayTodosBtn = document.getElementById("displayTodosBtn");
+var toggleTodosBtn = document.getElementById("toggleTodosBtn");
 
-    // Construct the todoList object
+// Construct the todoList object
+var todoList = {
 
-    var todoList = {
+    // Array of items
+    todos: [],
 
-        // Array of items
-        todos: [],
-
-        // create method to display all todoItems in the list
-        displayTodos: function displayTodos() {
-            if (this.todos.length === 0) {
-                console.log("The todo list is empty");
-            } else {
-                for (var i = 0; i < this.todos.length; i++) {
-                    if (this.todos[i].completed === true) {
-                        console.log("(x)", this.todos[i].todoTitle);
-                    } else {
-                        console.log("()", this.todos[i].todoTitle);
-                    }
-                }
-            }
-        },
-
-        // Create method to add todoItems to the list
-        addTodo: function addTodo(todoTitle) {
-            this.todos.push({
-                todoTitle: todoTitle,
-                completed: false
-            });
-
-            this.displayTodos();
-        },
-
-        // Create method to Change todoItems in the list
-        changeTodoTitle: function changeTodoTitle(position, newTodoTitle) {
-            this.todos[position].todoTitle = newTodoTitle;
-            this.displayTodos();
-        },
-
-        // Create method to delete todoItems in the list
-        deletedTodo: function deletedTodo(position) {
-            this.todos.splice(position, 1);
-            this.displayTodos();
-        },
-
-        // Create method to mark todoItems as completed in the list
-        toggleCompleted: function toggleCompleted(position) {
-            var todo = this.todos[position];
-            todo.completed = !todo.completed;
-            this.displayTodos();
-        },
-
-        // Create method to toggle all todoItems in the list as completed or !completed
-        toggleAll: function toggleAll() {
-            var totalTodos = this.todos.length;
-            var completedTodos = 0;
-
-            for (var i = 0; i < totalTodos; i++) {
+    // create method to display all todoItems in the list
+    displayTodos: function displayTodos() {
+        if (this.todos.length === 0) {
+            console.log("The todo list is empty");
+        } else {
+            for (var i = 0; i < this.todos.length; i++) {
                 if (this.todos[i].completed === true) {
-                    completedTodos++;
+                    console.log("(x)", this.todos[i].todoTitle);
+                } else {
+                    console.log("()", this.todos[i].todoTitle);
                 }
-            }
-
-            if (completedTodos === totalTodos) {
-                for (var _i = 0; _i < totalTodos; _i++) {
-                    this.todos[_i].completed = false;
-                }
-                this.displayTodos();
-            } else {
-                for (var _i2 = 0; _i2 < totalTodos; _i2++) {
-                    this.todos[_i2].completed = true;
-                }
-                this.displayTodos();
             }
         }
-    };
+    },
+
+    // Create method to add todoItems to the list
+    addTodo: function addTodo(todoTitle) {
+        this.todos.push({
+            todoTitle: todoTitle,
+            completed: false
+        });
+
+        this.displayTodos();
+    },
+
+    // Create method to Change todoItems in the list
+    changeTodoTitle: function changeTodoTitle(position, newTodoTitle) {
+        this.todos[position].todoTitle = newTodoTitle;
+        this.displayTodos();
+    },
+
+    // Create method to delete todoItems in the list
+    deletedTodo: function deletedTodo(position) {
+        this.todos.splice(position, 1);
+        this.displayTodos();
+    },
+
+    // Create method to mark todoItems as completed in the list
+    toggleCompleted: function toggleCompleted(position) {
+        var todo = this.todos[position];
+        todo.completed = !todo.completed;
+        this.displayTodos();
+    },
+
+    // Create method to toggle all todoItems in the list as completed or !completed
+    toggleAll: function toggleAll() {
+        var totalTodos = this.todos.length;
+        var completedTodos = 0;
+
+        for (var i = 0; i < totalTodos; i++) {
+            if (this.todos[i].completed === true) {
+                completedTodos++;
+            }
+        }
+
+        if (completedTodos === totalTodos) {
+            for (var _i = 0; _i < totalTodos; _i++) {
+                this.todos[_i].completed = false;
+            }
+        } else {
+            for (var _i2 = 0; _i2 < totalTodos; _i2++) {
+                this.todos[_i2].completed = true;
+            }
+        }
+        this.displayTodos();
+    }
+};
+
+displayTodosBtn.addEventListener("click", function () {
+    todoList.displayTodos();
+});
+toggleTodosBtn.addEventListener("click", function () {
+    todoList.toggleAll();
 });
 
 //# sourceMappingURL=app-compiled.js.map

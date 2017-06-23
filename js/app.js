@@ -1,4 +1,3 @@
-
 //TODO create a priority tasks list which will push items in it by clicking on i.e. a Star-icon.
 //TODO when user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
 //TODO create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
@@ -19,81 +18,83 @@
 //TODO Users should be able to sort tasks by date
 
 
-$(()=>{
 
-    // Construct the todoList object
+const displayTodosBtn = document.getElementById("displayTodosBtn");
+const toggleTodosBtn = document.getElementById("toggleTodosBtn");
 
-    let todoList = {
+// Construct the todoList object
+const todoList = {
 
-        // Array of items
-        todos : [],
+    // Array of items
+    todos : [],
 
-        // create method to display all todoItems in the list
-        displayTodos () {
-            if(this.todos.length === 0){
-                console.log("The todo list is empty");
-            } else {
-                for (let i = 0; i < this.todos.length; i++) {
-                    if (this.todos[i].completed === true) {
-                        console.log("(x)", this.todos[i].todoTitle);
-                    } else {
-                        console.log("()",this.todos[i].todoTitle);
-                    }
+    // create method to display all todoItems in the list
+    displayTodos () {
+        if(this.todos.length === 0){
+            console.log("The todo list is empty");
+        } else {
+            for (let i = 0; i < this.todos.length; i++) {
+                if (this.todos[i].completed === true) {
+                    console.log("(x)", this.todos[i].todoTitle);
+                } else {
+                    console.log("()",this.todos[i].todoTitle);
                 }
-            }
-        },
-        // Create method to add todoItems to the list
-        addTodo (todoTitle) {
-            this.todos.push({
-                todoTitle: todoTitle,
-                completed : false
-            });
-
-            this.displayTodos();
-        },
-        // Create method to Change todoItems in the list
-        changeTodoTitle (position, newTodoTitle) {
-            this.todos[position].todoTitle = newTodoTitle;
-            this.displayTodos();
-        },
-        // Create method to delete todoItems in the list
-        deletedTodo (position) {
-            this.todos.splice(position,1);
-            this.displayTodos();
-        },
-        // Create method to mark todoItems as completed in the list
-        toggleCompleted (position) {
-            let todo = this.todos[position];
-            todo.completed = !todo.completed;
-            this.displayTodos();
-        },
-        // Create method to toggle all todoItems in the list as completed or !completed
-        toggleAll () {
-            let totalTodos = this.todos.length;
-            let completedTodos = 0;
-
-            for(let i = 0; i < totalTodos; i++){
-                if(this.todos[i].completed === true){
-                    completedTodos++
-                }
-            }
-
-            if(completedTodos === totalTodos){
-                for(let i = 0; i < totalTodos; i++){
-                    this.todos[i].completed = false;
-                }
-                this.displayTodos();
-            } else {
-                for(let i = 0; i < totalTodos; i++){
-                    this.todos[i].completed = true;
-                }
-                this.displayTodos();
             }
         }
-    };
+    },
+    // Create method to add todoItems to the list
+    addTodo (todoTitle) {
+        this.todos.push({
+            todoTitle: todoTitle,
+            completed : false
+        });
 
+        this.displayTodos();
+    },
+    // Create method to Change todoItems in the list
+    changeTodoTitle (position, newTodoTitle) {
+        this.todos[position].todoTitle = newTodoTitle;
+        this.displayTodos();
+    },
+    // Create method to delete todoItems in the list
+    deletedTodo (position) {
+        this.todos.splice(position,1);
+        this.displayTodos();
+    },
+    // Create method to mark todoItems as completed in the list
+    toggleCompleted (position) {
+        let todo = this.todos[position];
+        todo.completed = !todo.completed;
+        this.displayTodos();
+    },
+    // Create method to toggle all todoItems in the list as completed or !completed
+    toggleAll () {
+        let totalTodos = this.todos.length;
+        let completedTodos = 0;
 
+        for(let i = 0; i < totalTodos; i++){
+            if(this.todos[i].completed === true){
+                completedTodos++
+            }
+        }
 
+        if(completedTodos === totalTodos){
+            for(let i = 0; i < totalTodos; i++){
+                this.todos[i].completed = false;
+            }
+        } else {
+            for(let i = 0; i < totalTodos; i++){
+                this.todos[i].completed = true;
+            }
+        }
+        this.displayTodos();
+    }
+};
 
+displayTodosBtn.addEventListener("click", () => {
+    todoList.displayTodos();
+});
+toggleTodosBtn.addEventListener("click", () => {
+    todoList.toggleAll();
 });
 
