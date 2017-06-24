@@ -98,13 +98,30 @@ var handlers = {
     displayTodos: function displayTodos() {
         todoList.displayTodos();
     },
-    toggleTodos: function toggleTodos() {
-        todoList.toggleAll();
-    },
     addTodo: function addTodo() {
         var addTodoInputValue = document.getElementById("addTodoValueInput");
         todoList.addTodo(addTodoInputValue.value);
         addTodoInputValue.value = "";
+    },
+    changeTodo: function changeTodo() {
+        var changeTodoPositionInput = document.querySelector("#changeTodoPosition");
+        var changeTodoValueInput = document.querySelector("#changeTodoTextInput");
+        todoList.changeTodoTitle(changeTodoPositionInput.valueAsNumber, changeTodoValueInput.value);
+        changeTodoPositionInput.value = "";
+        changeTodoValueInput.value = "";
+    },
+    deleteTodo: function deleteTodo() {
+        var deleteTodoPositionInput = document.querySelector("#deleteTodoPositionInput");
+        todoList.deletedTodo(deleteTodoPositionInput.valueAsNumber);
+        deleteTodoPositionInput.value = "";
+    },
+    toggleCompleted: function toggleCompleted() {
+        var completedTodoPosition = document.querySelector("#completedTodoPosition");
+        todoList.toggleCompleted(completedTodoPosition.valueAsNumber);
+        completedTodoPosition.value = "";
+    },
+    toggleTodos: function toggleTodos() {
+        todoList.toggleAll();
     }
 };
 

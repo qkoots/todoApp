@@ -93,15 +93,34 @@ const handlers = {
         todoList.displayTodos();
     },
 
-    toggleTodos() {
-        todoList.toggleAll();
-    },
-
     addTodo() {
         let addTodoInputValue = document.getElementById("addTodoValueInput");
         todoList.addTodo(addTodoInputValue.value);
         addTodoInputValue.value = "";
     },
 
+    changeTodo() {
+        let changeTodoPositionInput = document.querySelector("#changeTodoPosition");
+        let changeTodoValueInput = document.querySelector("#changeTodoTextInput");
+        todoList.changeTodoTitle(changeTodoPositionInput.valueAsNumber,changeTodoValueInput.value);
+        changeTodoPositionInput.value = "";
+        changeTodoValueInput.value = "";
+    },
+    
+    deleteTodo(){
+        let deleteTodoPositionInput = document.querySelector("#deleteTodoPositionInput");
+        todoList.deletedTodo(deleteTodoPositionInput.valueAsNumber);
+        deleteTodoPositionInput.value = "";
+    },
+
+    toggleCompleted() {
+        let completedTodoPosition = document.querySelector("#completedTodoPosition");
+        todoList.toggleCompleted(completedTodoPosition.valueAsNumber);
+        completedTodoPosition.value = "";
+    },
+
+    toggleTodos() {
+        todoList.toggleAll();
+    },
 };
 
