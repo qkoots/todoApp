@@ -20,13 +20,22 @@
         <div>
             <input type="text" id="addTodoValueInput" placeholder="Add item"/>
             <button onclick="handlers.addTodo()">Add</button>
-            <button onclick="handlers.addTodo()">Remove</button>
         </div>
 
         <div>
             <input id="changeTodoPosition" type="number">
             <input id="changeTodoTextInput" type="text">
             <button onclick="handlers.changeTodo()">Change Todo</button>
+        </div>
+
+        <div>
+            <input id="completedTodoPosition" type="number">
+            <button onclick="handlers.toggleCompleted()">Completed</button>
+        </div>
+
+        <div>
+            <input type="number" id="deleteTodoPositionInput">
+            <button onclick="handlers.deleteTodo()">Delete</button>
         </div>
 
         <script src="js/app.js"></script>
