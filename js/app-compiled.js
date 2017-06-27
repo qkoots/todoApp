@@ -61,6 +61,14 @@ var lists = {
             completed: !todo.completed,
             priority: false
         });
+    },
+    toggleNotCompleted: function toggleNotCompleted(position) {
+        var todo = this.completedTodos[position];
+        this.todos.push({
+            todoTitle: todo.todoTitle,
+            completed: todo.completed,
+            priority: todo.priority
+        });
     }
 };
 
@@ -88,6 +96,12 @@ var handlers = {
     toggleCompleted: function toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
+        view.displayTodos();
+        view.displayCompletedTodos();
+    },
+    toggleNotCompleted: function toggleNotCompleted(position) {
+        lists.toggleNotCompleted(position);
+        lists.deletedTodo(null, position);
         view.displayTodos();
         view.displayCompletedTodos();
     }
@@ -164,7 +178,7 @@ var view = {
             if (elementClicked.className === "deleteBtn") {
                 handlers.deleteTodo(ul, position);
             } else if (elementClicked.className === "notCompletedBtn") {
-                handlers.toggleCompleted(position);
+                handlers.toggleNotCompleted(position);
             }
         });
     }
