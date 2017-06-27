@@ -30,39 +30,43 @@ const todoList = {
             todoTitle: todoTitle,
             completed : false
         });
-
     },
+
     // Create method to Change todoItems in the list
     changeTodoTitle (position, newTodoTitle) {
         this.todos[position].todoTitle = newTodoTitle;
     },
+
     // Create method to delete todoItems in the list
     deletedTodo (position) {
         this.todos.splice(position,1);
     },
+
     // Create method to mark todoItems as completed in the list
     toggleCompleted (position) {
         let todo = this.todos[position];
         todo.completed = !todo.completed;
     },
+
     // Create method to toggle all todoItems in the list as completed or !completed
     toggleAll () {
-        let totalTodos = this.todos.length;
+        let totalTodos = this.todos;
         let completedTodos = 0;
 
-        for(let i = 0; i < totalTodos; i++){
-            if(this.todos[i].completed === true){
+        totalTodos.forEach(todo => {
+            if (todo.completed === true) {
                 completedTodos++
             }
-        }
-        if(completedTodos === totalTodos){
-            for(let i = 0; i < totalTodos; i++){
-                this.todos[i].completed = false;
-            }
+        });
+
+        if(completedTodos === totalTodos.length){
+            totalTodos.forEach(todo => {
+                todo.completed = false;
+            });
         } else {
-            for(let i = 0; i < totalTodos; i++){
-                this.todos[i].completed = true;
-            }
+            totalTodos.forEach(todo => {
+                todo.completed = true;
+            });
         }
     }
 };
@@ -86,10 +90,8 @@ const handlers = {
         view.displayTodos();
     },
 
-    deleteTodo(){
-        let deleteTodoPositionInput = document.querySelector("#deleteTodoPositionInput");
-        todoList.deletedTodo(deleteTodoPositionInput.valueAsNumber);
-        deleteTodoPositionInput.value = "";
+    deleteTodo(position){
+        todoList.deletedTodo(position);
         view.displayTodos();
     },
 
@@ -109,9 +111,10 @@ const handlers = {
 
 const view = {
 
+    todoUl : document.querySelector("ul"),
+
     displayTodos() {
-        let todoUl = document.querySelector("ul");
-        todoUl.innerHTML = "";
+        this.todoUl.innerHTML = "";
 
         for (let i = 0; i < todoList.todos.length; i++) {
             let todos = todoList.todos[i];
@@ -124,8 +127,30 @@ const view = {
                 todoWithCompletion = `( )${todos.todoTitle}`;
             }
 
+            todoLi.id = i;
             todoLi.textContent = todoWithCompletion;
-            todoUl.appendChild(todoLi);
+            todoLi.appendChild(this.createDeleteBtn());
+            this.todoUl.appendChild(todoLi);
         }
+    },
+
+    createDeleteBtn() {
+        let deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "deleteBtn";
+        return deleteBtn;
+    },
+
+    setupEventListeners() {
+        this.todoUl.addEventListener("click", event => {
+            let elementClicked = event.target;
+
+            if (elementClicked.className === "deleteBtn") {
+                handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+            }
+        });
     }
 };
+
+view.setupEventListeners();
+
