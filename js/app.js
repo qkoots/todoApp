@@ -18,57 +18,45 @@
 //TODO Users should be able to sort tasks by date
 
 
-// Construct the todoList object
-const todoList = {
+// Construct the lists object
+const lists = {
 
     // Array of items
-    todos : [],
+    todos          : [],
+    completedTodos : [],
 
     // Create method to add todoItems to the list
-    addTodo (todoTitle) {
+    addTodo(todoTitle) {
         this.todos.push({
-            todoTitle: todoTitle,
-            completed : false
+            todoTitle : todoTitle,
+            completed : false,
+            priority  : false
         });
     },
 
     // Create method to Change todoItems in the list
-    changeTodoTitle (position, newTodoTitle) {
+    changeTodoTitle(position, newTodoTitle) {
         this.todos[position].todoTitle = newTodoTitle;
     },
 
-    // Create method to delete todoItems in the list
-    deletedTodo (position) {
-        this.todos.splice(position,1);
+    // Create method to delete todoItems in the todos array
+    deletedTodo(ul,position) {
+        if(ul === "todoUl") {
+            this.todos.splice(position, 1);
+        } else {
+            this.completedTodos.splice(position,1);
+        }
     },
 
     // Create method to mark todoItems as completed in the list
-    toggleCompleted (position) {
+    toggleCompleted(position) {
         let todo = this.todos[position];
-        todo.completed = !todo.completed;
-    },
-
-    // Create method to toggle all todoItems in the list as completed or !completed
-    toggleAll () {
-        let totalTodos = this.todos;
-        let completedTodos = 0;
-
-        totalTodos.forEach(todo => {
-            if (todo.completed === true) {
-                completedTodos++
-            }
+        this.completedTodos.push({
+            todoTitle : todo.todoTitle,
+            completed : !todo.completed,
+            priority  : false
         });
-
-        if(completedTodos === totalTodos.length){
-            totalTodos.forEach(todo => {
-                todo.completed = false;
-            });
-        } else {
-            totalTodos.forEach(todo => {
-                todo.completed = true;
-            });
-        }
-    }
+    },
 };
 
 // Handlers for the events the user triggers.
@@ -76,7 +64,7 @@ const handlers = {
 
     addTodo() {
         let addTodoInputValue = document.getElementById("addTodoValueInput");
-        todoList.addTodo(addTodoInputValue.value);
+        lists.addTodo(addTodoInputValue.value);
         addTodoInputValue.value = "";
         view.displayTodos();
     },
@@ -84,54 +72,56 @@ const handlers = {
     changeTodo() {
         let changeTodoPositionInput = document.querySelector("#changeTodoPosition");
         let changeTodoValueInput = document.querySelector("#changeTodoTextInput");
-        todoList.changeTodoTitle(changeTodoPositionInput.valueAsNumber,changeTodoValueInput.value);
+        lists.changeTodoTitle(changeTodoPositionInput.valueAsNumber,changeTodoValueInput.value);
         changeTodoPositionInput.value = "";
         changeTodoValueInput.value = "";
         view.displayTodos();
     },
 
-    deleteTodo(position){
-        todoList.deletedTodo(position);
+    deleteTodo(ul,position){
+        lists.deletedTodo(ul,position);
         view.displayTodos();
+        view.displayCompletedTodos();
     },
 
-    toggleCompleted() {
-        let completedTodoPosition = document.querySelector("#completedTodoPosition");
-        todoList.toggleCompleted(completedTodoPosition.valueAsNumber);
-        completedTodoPosition.value = "";
+    toggleCompleted(ul,position) {
+        lists.toggleCompleted(position);
+        lists.deletedTodo(ul,position);
         view.displayTodos();
-
-    },
-
-    toggleTodos() {
-        todoList.toggleAll();
-        view.displayTodos();
+        view.displayCompletedTodos();
     },
 };
 
 const view = {
-
-    todoUl : document.querySelector("ul"),
+    todoUl : document.querySelector("#todoUl"),
+    completedUl: document.querySelector("#completedUl"),
 
     displayTodos() {
         this.todoUl.innerHTML = "";
 
-        for (let i = 0; i < todoList.todos.length; i++) {
-            let todos = todoList.todos[i];
+        lists.todos.forEach((todo,position) => {
             let todoLi = document.createElement("li");
-            let todoWithCompletion = "";
-
-            if (todos.completed === true) {
-                todoWithCompletion = `(x)${todos.todoTitle}`;
-            } else {
-                todoWithCompletion = `( )${todos.todoTitle}`;
-            }
-
-            todoLi.id = i;
-            todoLi.textContent = todoWithCompletion;
+            todoLi.id = position;
+            todoLi.textContent = todo.todoTitle;
             todoLi.appendChild(this.createDeleteBtn());
+            todoLi.appendChild(this.createCompleteBtn());
             this.todoUl.appendChild(todoLi);
-        }
+
+        }, this);
+    },
+
+    displayCompletedTodos() {
+        this.completedUl.innerHTML = "";
+        
+        lists.completedTodos.forEach((todo,position) => {
+            let completedLi = document.createElement("li");
+            completedLi.id = `completed-${position}`;
+            completedLi.textContent = todo.todoTitle;
+            todo.completed = !todo.completed;
+            completedLi.appendChild(this.createDeleteBtn());
+            completedLi.appendChild(this.createNotCompleteBtn());
+            this.completedUl.appendChild(completedLi);
+        },this);
     },
 
     createDeleteBtn() {
@@ -141,12 +131,42 @@ const view = {
         return deleteBtn;
     },
 
+    createCompleteBtn() {
+        let completedBtn = document.createElement("button");
+        completedBtn.textContent = "Complete";
+        completedBtn.className ="completedBtn";
+        return completedBtn;
+    },
+
+    createNotCompleteBtn() {
+        let notCompletedBtn = document.createElement("button");
+        notCompletedBtn.textContent = "Mark as Todo";
+        notCompletedBtn.className ="notCompletedBtn";
+        return notCompletedBtn;
+    },
+
     setupEventListeners() {
         this.todoUl.addEventListener("click", event => {
             let elementClicked = event.target;
+            let ul = "todoUl";
 
-            if (elementClicked.className === "deleteBtn") {
-                handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+            if(elementClicked.className === "deleteBtn"){
+                handlers.deleteTodo(ul,elementClicked.parentNode.id);
+            } else if(elementClicked.className === "completedBtn"){
+                handlers.toggleCompleted(ul,elementClicked.parentNode.id);
+            }
+        });
+
+        this.completedUl.addEventListener("click", event => {
+            let elementClicked = event.target;
+            let ul = "completedUl";
+            let position = elementClicked.parentNode.id.substr(10);
+
+            if(elementClicked.className === "deleteBtn"){
+                handlers.deleteTodo(ul,position);
+
+            } else if(elementClicked.className === "notCompletedBtn"){
+                handlers.toggleCompleted(position);
             }
         });
     }
