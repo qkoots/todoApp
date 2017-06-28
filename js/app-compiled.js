@@ -29,26 +29,30 @@ var lists = {
 
     // Create method to add todoItems to the list
     addTodo: function addTodo(todoTitle) {
-        this.todos.push({
+        this.todos.unshift({
             todoTitle: todoTitle,
             completed: false,
             priority: false
         });
     },
-
-
-    // Create method to Change todoItems in the list
-    changeTodoTitle: function changeTodoTitle(position, newTodoTitle) {
-        this.todos[position].todoTitle = newTodoTitle;
-    },
-
-
-    // Create method to delete todoItems in the todos array
     deletedTodo: function deletedTodo(ul, position) {
         if (ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
             this.completedTodos.splice(position, 1);
+        }
+    },
+    makeTodoPriority: function makeTodoPriority(position) {
+        var positionInArray = position;
+        var todo = this.todos[position];
+        this.todos.splice(positionInArray, 1);
+
+        if (todo.priority !== true) {
+            this.todos.unshift({
+                todoTitle: todo.todoTitle,
+                completed: !todo.completed,
+                priority: todo.priority
+            });
         }
     },
 
@@ -80,16 +84,13 @@ var handlers = {
         addTodoInputValue.value = "";
         view.displayTodos();
     },
-    changeTodo: function changeTodo() {
-        var changeTodoPositionInput = document.querySelector("#changeTodoPosition");
-        var changeTodoValueInput = document.querySelector("#changeTodoTextInput");
-        lists.changeTodoTitle(changeTodoPositionInput.valueAsNumber, changeTodoValueInput.value);
-        changeTodoPositionInput.value = "";
-        changeTodoValueInput.value = "";
-        view.displayTodos();
-    },
     deleteTodo: function deleteTodo(ul, position) {
         lists.deletedTodo(ul, position);
+        view.displayTodos();
+        view.displayCompletedTodos();
+    },
+    makeTodoPriority: function makeTodoPriority(position) {
+        lists.makeTodoPriority(position);
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -121,6 +122,7 @@ var view = {
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
             todoLi.appendChild(_this.createDeleteBtn());
+            todoLi.appendChild(_this.createPriorityBtn());
             todoLi.appendChild(_this.createCompleteBtn());
             _this.todoUl.appendChild(todoLi);
         }, this);
@@ -152,6 +154,12 @@ var view = {
         completedBtn.className = "completedBtn";
         return completedBtn;
     },
+    createPriorityBtn: function createPriorityBtn() {
+        var priorityBtn = document.createElement("button");
+        priorityBtn.textContent = "Priority";
+        priorityBtn.className = "priority";
+        return priorityBtn;
+    },
     createNotCompleteBtn: function createNotCompleteBtn() {
         var notCompletedBtn = document.createElement("button");
         notCompletedBtn.textContent = "Mark as Todo";
@@ -167,6 +175,8 @@ var view = {
                 handlers.deleteTodo(ul, elementClicked.parentNode.id);
             } else if (elementClicked.className === "completedBtn") {
                 handlers.toggleCompleted(ul, elementClicked.parentNode.id);
+            } else if (elementClicked.className === "priority") {
+                handlers.makeTodoPriority(elementClicked.parentNode.id);
             }
         });
 
