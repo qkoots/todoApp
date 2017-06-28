@@ -26,11 +26,11 @@ const lists = {
     completedTodos : [],
 
     // Create method to add todoItems to the list
-    addTodo(todoTitle) {
+    addTodo(todoTitle, priority = false) {
         this.todos.unshift({
             todoTitle : todoTitle,
             completed : false,
-            priority  : false
+            priority  : priority,
         });
     },
 
@@ -43,36 +43,33 @@ const lists = {
     },
 
     makeTodoPriority(position){
-        let positionInArray = position;
-        let todo = this.todos[position];
-        this.todos.splice(positionInArray,1);
-
-        if(todo.priority !== true){
-            this.todos.unshift({
-                todoTitle : todo.todoTitle,
-                completed : !todo.completed,
-                priority  : todo.priority,
-            });
-        }
+        let todo = this.todos.splice(position,1);
+        todo.forEach(todo=>{
+            this.addTodo(todo.todoTitle, true);
+        },this)
     },
 
     // Create method to mark todoItems as completed in the list
     toggleCompleted(position) {
         let todo = this.todos[position];
-        this.completedTodos.push({
+        todo.completed = !todo.completed;
+
+        this.completedTodos.unshift({
             todoTitle : todo.todoTitle,
-            completed : !todo.completed,
-            priority  : false
+            completed : todo.completed,
+            priority  : todo.priority
         });
     },
 
     toggleNotCompleted(position) {
         let todo = this.completedTodos[position];
+        todo.completed = false;
+
         this.todos.push({
             todoTitle : todo.todoTitle,
             completed: todo.completed,
             priority: todo.priority
-        })
+        });
     },
 };
 
@@ -179,11 +176,11 @@ const view = {
             let ul = "todoUl";
 
             if(elementClicked.className === "deleteBtn"){
-                handlers.deleteTodo(ul,elementClicked.parentNode.id);
+                handlers.deleteTodo(ul,parseInt(elementClicked.parentNode.id));
             } else if(elementClicked.className === "completedBtn"){
-                handlers.toggleCompleted(ul,elementClicked.parentNode.id);
+                handlers.toggleCompleted(ul,parseInt(elementClicked.parentNode.id));
             } else if(elementClicked.className === "priority"){
-                handlers.makeTodoPriority(elementClicked.parentNode.id)
+                handlers.makeTodoPriority(parseInt(elementClicked.parentNode.id));
             }
         });
 

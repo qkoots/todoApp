@@ -29,10 +29,12 @@ var lists = {
 
     // Create method to add todoItems to the list
     addTodo: function addTodo(todoTitle) {
+        var priority = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
         this.todos.unshift({
             todoTitle: todoTitle,
             completed: false,
-            priority: false
+            priority: priority
         });
     },
     deletedTodo: function deletedTodo(ul, position) {
@@ -43,31 +45,30 @@ var lists = {
         }
     },
     makeTodoPriority: function makeTodoPriority(position) {
-        var positionInArray = position;
-        var todo = this.todos[position];
-        this.todos.splice(positionInArray, 1);
+        var _this = this;
 
-        if (todo.priority !== true) {
-            this.todos.unshift({
-                todoTitle: todo.todoTitle,
-                completed: !todo.completed,
-                priority: todo.priority
-            });
-        }
+        var todo = this.todos.splice(position, 1);
+        todo.forEach(function (todo) {
+            _this.addTodo(todo.todoTitle, true);
+        }, this);
     },
 
 
     // Create method to mark todoItems as completed in the list
     toggleCompleted: function toggleCompleted(position) {
         var todo = this.todos[position];
-        this.completedTodos.push({
+        todo.completed = !todo.completed;
+
+        this.completedTodos.unshift({
             todoTitle: todo.todoTitle,
-            completed: !todo.completed,
-            priority: false
+            completed: todo.completed,
+            priority: todo.priority
         });
     },
     toggleNotCompleted: function toggleNotCompleted(position) {
         var todo = this.completedTodos[position];
+        todo.completed = false;
+
         this.todos.push({
             todoTitle: todo.todoTitle,
             completed: todo.completed,
@@ -113,7 +114,7 @@ var view = {
     completedUl: document.querySelector("#completedUl"),
 
     displayTodos: function displayTodos() {
-        var _this = this;
+        var _this2 = this;
 
         this.todoUl.innerHTML = "";
 
@@ -121,14 +122,14 @@ var view = {
             var todoLi = document.createElement("li");
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.appendChild(_this.createDeleteBtn());
-            todoLi.appendChild(_this.createPriorityBtn());
-            todoLi.appendChild(_this.createCompleteBtn());
-            _this.todoUl.appendChild(todoLi);
+            todoLi.appendChild(_this2.createDeleteBtn());
+            todoLi.appendChild(_this2.createPriorityBtn());
+            todoLi.appendChild(_this2.createCompleteBtn());
+            _this2.todoUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
-        var _this2 = this;
+        var _this3 = this;
 
         this.completedUl.innerHTML = "";
 
@@ -137,9 +138,9 @@ var view = {
             completedLi.id = "completed-" + position;
             completedLi.textContent = todo.todoTitle;
             todo.completed = !todo.completed;
-            completedLi.appendChild(_this2.createDeleteBtn());
-            completedLi.appendChild(_this2.createNotCompleteBtn());
-            _this2.completedUl.appendChild(completedLi);
+            completedLi.appendChild(_this3.createDeleteBtn());
+            completedLi.appendChild(_this3.createNotCompleteBtn());
+            _this3.completedUl.appendChild(completedLi);
         }, this);
     },
     createDeleteBtn: function createDeleteBtn() {
@@ -172,11 +173,11 @@ var view = {
             var ul = "todoUl";
 
             if (elementClicked.className === "deleteBtn") {
-                handlers.deleteTodo(ul, elementClicked.parentNode.id);
+                handlers.deleteTodo(ul, parseInt(elementClicked.parentNode.id));
             } else if (elementClicked.className === "completedBtn") {
-                handlers.toggleCompleted(ul, elementClicked.parentNode.id);
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             } else if (elementClicked.className === "priority") {
-                handlers.makeTodoPriority(elementClicked.parentNode.id);
+                handlers.makeTodoPriority(parseInt(elementClicked.parentNode.id));
             }
         });
 
