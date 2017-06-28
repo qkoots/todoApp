@@ -3,7 +3,8 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/js/app-compiled.js" />
-        <item url="file://$PROJECT_DIR$/js/newApp-compiled.js" />
+        <item url="file://$PROJECT_DIR$/todoApp/js/app-compiled.js" />
+        <item url="file://$PROJECT_DIR$/todoApp/js/app-compiled-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
@@ -11,8 +12,10 @@
       <root url="file://$PROJECT_DIR$/app-compiled.js" />
       <root url="file://$PROJECT_DIR$/js/searchTasks-compiled.js" />
       <root url="file://$PROJECT_DIR$/js/date-compiled.js" />
-      <root url="file://$PROJECT_DIR$/js/app-compiled.js" />
       <root url="file://$PROJECT_DIR$/js/newApp-compiled.js" />
+      <root url="file://$PROJECT_DIR$/js/app-compiled.js" />
+      <root url="file://$PROJECT_DIR$/todoApp/js/app-compiled.js" />
+      <root url="file://$PROJECT_DIR$/todoApp/js/app-compiled-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>
