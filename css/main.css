@@ -1,0 +1,56 @@
+
+@media (max-width: 575px) {
+
+    .container-fluid {
+        padding: 0;
+        margin: 0;
+    }
+    .container {
+        padding: 0;
+    }
+    .outerHeader {
+        background-color: #b4b472;
+    }
+
+    h1 {
+        padding: 1em 0 .4em 0 ;
+        text-align: center;
+        font-size: 1.6em;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .inputArea {
+        border: 2px solid yellow;
+    }
+
+    .inputArea button {
+        padding: 20px;
+    }
+
+    ul {
+        width: 95%;
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    li {
+        margin: .2em 0;
+        list-style-type: none;
+    }
+
+    #todoUl li {
+        background-color: bisque;
+    }
+    #completedUl li {
+        background-color: darkgray;
+        text-decoration: line-through;
+    }
+
+    #completedUl li.
+    }
+}
