@@ -158,7 +158,7 @@ var view = {
     createCheckBox: function createCheckBox() {
         var checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.className = "completedCheckBox";
+        checkbox.className = "checkBox";
         return checkbox;
     },
     createPriorityBtn: function createPriorityBtn() {

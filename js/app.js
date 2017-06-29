@@ -158,7 +158,7 @@ const view = {
     createCheckBox() {
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.className = "completedCheckBox";
+        checkbox.className = "checkBox";
         return checkbox;
     },
 
