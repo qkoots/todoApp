@@ -34,24 +34,31 @@ const lists = {
         });
     },
 
-    deletedTodo(ul,position) {
+    deletedTodo(ul, position) {
         if(ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
-            this.completedTodos.splice(position,1);
+            this.completedTodos.splice(position, 1);
         }
     },
 
     makeTodoPriority(position){
-        let todo = this.todos.splice(position,1);
-        todo.forEach(todo=>{
-            this.addTodo(todo.todoTitle, true);
-        },this)
+        let todo = this.todos[position];
+
+        if(todo.priority === true) {
+             todo.priority = !todo.priority;
+        } else {
+            let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
+
+            removeTodoFromCurrentPosition.forEach(todo=> {
+                this.addTodo(todo.todoTitle, true);
+            }, this);
+        }
     },
 
     // Create method to mark todoItems as completed in the list
     toggleCompleted(position) {
-        let todo = this.todos[position];
+        let todo       = this.todos[position];
         todo.completed = !todo.completed;
 
         this.completedTodos.unshift({
@@ -62,13 +69,13 @@ const lists = {
     },
 
     toggleNotCompleted(position) {
-        let todo = this.completedTodos[position];
+        let todo       = this.completedTodos[position];
         todo.completed = false;
 
         this.todos.push({
             todoTitle : todo.todoTitle,
-            completed: todo.completed,
-            priority: todo.priority
+            completed : todo.completed,
+            priority  : todo.priority
         });
     },
 };

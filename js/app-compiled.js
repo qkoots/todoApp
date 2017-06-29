@@ -47,10 +47,17 @@ var lists = {
     makeTodoPriority: function makeTodoPriority(position) {
         var _this = this;
 
-        var todo = this.todos.splice(position, 1);
-        todo.forEach(function (todo) {
-            _this.addTodo(todo.todoTitle, true);
-        }, this);
+        var todo = this.todos[position];
+
+        if (todo.priority === true) {
+            todo.priority = !todo.priority;
+        } else {
+            var removeTodoFromCurrentPosition = this.todos.splice(position, 1);
+
+            removeTodoFromCurrentPosition.forEach(function (todo) {
+                _this.addTodo(todo.todoTitle, true);
+            }, this);
+        }
     },
 
 
