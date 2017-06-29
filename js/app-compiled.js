@@ -1,12 +1,12 @@
 "use strict";
 
-//TODO create a priority tasks list which will push items in it by clicking on i.e. a Star-icon.
-//TODO when user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
-//TODO create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
+//Create a method which will mark item as priority by clicking on i.e. a Star-icon.
+//When user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
+//Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
 //TODO line-through the completedTasks text (text-decoration prop CSS).
 //TODO Add item to task list by pressing enterKey.
 //TODO View option to only see the priority items.
-//TODO Empty input form after items has been added.
+//Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
@@ -18,7 +18,6 @@
 //TODO Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
-
 
 // Construct the lists object
 var lists = {
@@ -129,9 +128,9 @@ var view = {
             var todoLi = document.createElement("li");
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.appendChild(_this2.createDeleteBtn());
+            todoLi.prepend(_this2.createCheckBox());
             todoLi.appendChild(_this2.createPriorityBtn());
-            todoLi.appendChild(_this2.createCompleteBtn());
+            todoLi.appendChild(_this2.createDeleteBtn());
             _this2.todoUl.appendChild(todoLi);
         }, this);
     },
@@ -145,8 +144,8 @@ var view = {
             completedLi.id = "completed-" + position;
             completedLi.textContent = todo.todoTitle;
             todo.completed = !todo.completed;
+            completedLi.prepend(_this3.createCheckBox());
             completedLi.appendChild(_this3.createDeleteBtn());
-            completedLi.appendChild(_this3.createNotCompleteBtn());
             _this3.completedUl.appendChild(completedLi);
         }, this);
     },
@@ -156,35 +155,30 @@ var view = {
         deleteBtn.className = "deleteBtn";
         return deleteBtn;
     },
-    createCompleteBtn: function createCompleteBtn() {
-        var completedBtn = document.createElement("button");
-        completedBtn.textContent = "Complete";
-        completedBtn.className = "completedBtn";
-        return completedBtn;
+    createCheckBox: function createCheckBox() {
+        var checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "completedCheckBox";
+        return checkbox;
     },
     createPriorityBtn: function createPriorityBtn() {
         var priorityBtn = document.createElement("button");
         priorityBtn.textContent = "Priority";
-        priorityBtn.className = "priority";
+        priorityBtn.className = "priorityBtn";
         return priorityBtn;
-    },
-    createNotCompleteBtn: function createNotCompleteBtn() {
-        var notCompletedBtn = document.createElement("button");
-        notCompletedBtn.textContent = "Mark as Todo";
-        notCompletedBtn.className = "notCompletedBtn";
-        return notCompletedBtn;
     },
     setupEventListeners: function setupEventListeners() {
         this.todoUl.addEventListener("click", function (event) {
             var elementClicked = event.target;
+            var elementParentIdValue = parseInt(elementClicked.parentNode.id);
             var ul = "todoUl";
 
             if (elementClicked.className === "deleteBtn") {
-                handlers.deleteTodo(ul, parseInt(elementClicked.parentNode.id));
-            } else if (elementClicked.className === "completedBtn") {
-                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            } else if (elementClicked.className === "priority") {
-                handlers.makeTodoPriority(parseInt(elementClicked.parentNode.id));
+                handlers.deleteTodo(ul, elementParentIdValue);
+            } else if (elementClicked.checked) {
+                handlers.toggleCompleted(ul, elementParentIdValue);
+            } else if (elementClicked.className === "priorityBtn") {
+                handlers.makeTodoPriority(elementParentIdValue);
             }
         });
 
@@ -195,7 +189,7 @@ var view = {
 
             if (elementClicked.className === "deleteBtn") {
                 handlers.deleteTodo(ul, position);
-            } else if (elementClicked.className === "notCompletedBtn") {
+            } else if (elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
             }
         });

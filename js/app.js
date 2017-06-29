@@ -1,10 +1,10 @@
-//TODO create a priority tasks list which will push items in it by clicking on i.e. a Star-icon.
-//TODO when user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
-//TODO create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
+//Create a method which will mark item as priority by clicking on i.e. a Star-icon.
+//When user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
+//Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
 //TODO line-through the completedTasks text (text-decoration prop CSS).
 //TODO Add item to task list by pressing enterKey.
 //TODO View option to only see the priority items.
-//TODO Empty input form after items has been added.
+//Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
@@ -17,7 +17,6 @@
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
 
-
 // Construct the lists object
 const lists = {
 
@@ -26,7 +25,7 @@ const lists = {
     completedTodos : [],
 
     // Create method to add todoItems to the list
-    addTodo(todoTitle, priority = false) {
+    addTodo (todoTitle, priority = false) {
         this.todos.unshift({
             todoTitle : todoTitle,
             completed : false,
@@ -34,7 +33,7 @@ const lists = {
         });
     },
 
-    deletedTodo(ul, position) {
+    deletedTodo (ul, position) {
         if(ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
@@ -42,11 +41,11 @@ const lists = {
         }
     },
 
-    makeTodoPriority(position){
+    makeTodoPriority (position) {
         let todo = this.todos[position];
 
         if(todo.priority === true) {
-             todo.priority = !todo.priority;
+            todo.priority = !todo.priority;
         } else {
             let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
@@ -57,7 +56,7 @@ const lists = {
     },
 
     // Create method to mark todoItems as completed in the list
-    toggleCompleted(position) {
+    toggleCompleted (position) {
         let todo       = this.todos[position];
         todo.completed = !todo.completed;
 
@@ -68,7 +67,7 @@ const lists = {
         });
     },
 
-    toggleNotCompleted(position) {
+    toggleNotCompleted (position) {
         let todo       = this.completedTodos[position];
         todo.completed = false;
 
@@ -90,8 +89,8 @@ const handlers = {
         view.displayTodos();
     },
 
-    deleteTodo(ul,position){
-        lists.deletedTodo(ul,position);
+    deleteTodo(ul, position){
+        lists.deletedTodo(ul, position);
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -102,103 +101,97 @@ const handlers = {
         view.displayCompletedTodos();
     },
 
-    toggleCompleted(ul,position) {
+    toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
-        lists.deletedTodo(ul,position);
+        lists.deletedTodo(ul, position);
         view.displayTodos();
         view.displayCompletedTodos();
     },
 
     toggleNotCompleted(position) {
         lists.toggleNotCompleted(position);
-        lists.deletedTodo(null,position);
+        lists.deletedTodo(null, position);
         view.displayTodos();
         view.displayCompletedTodos();
     },
 };
 
 const view = {
-    todoUl : document.querySelector("#todoUl"),
-    completedUl: document.querySelector("#completedUl"),
+    todoUl      : document.querySelector("#todoUl"),
+    completedUl : document.querySelector("#completedUl"),
 
     displayTodos() {
         this.todoUl.innerHTML = "";
 
-        lists.todos.forEach((todo,position) => {
-            let todoLi = document.createElement("li");
-            todoLi.id = position;
+        lists.todos.forEach((todo, position) => {
+            let todoLi         = document.createElement("li");
+            todoLi.id          = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.appendChild(this.createDeleteBtn());
+            todoLi.prepend(this.createCheckBox());
             todoLi.appendChild(this.createPriorityBtn());
-            todoLi.appendChild(this.createCompleteBtn());
+            todoLi.appendChild(this.createDeleteBtn());
             this.todoUl.appendChild(todoLi);
         }, this);
     },
 
     displayCompletedTodos() {
         this.completedUl.innerHTML = "";
-        
-        lists.completedTodos.forEach((todo,position) => {
-            let completedLi = document.createElement("li");
-            completedLi.id = `completed-${position}`;
+
+        lists.completedTodos.forEach((todo, position) => {
+            let completedLi         = document.createElement("li");
+            completedLi.id          = `completed-${position}`;
             completedLi.textContent = todo.todoTitle;
-            todo.completed = !todo.completed;
+            todo.completed          = !todo.completed;
+            completedLi.prepend(this.createCheckBox());
             completedLi.appendChild(this.createDeleteBtn());
-            completedLi.appendChild(this.createNotCompleteBtn());
             this.completedUl.appendChild(completedLi);
-        },this);
+        }, this);
     },
 
     createDeleteBtn() {
-        let deleteBtn = document.createElement("button");
+        let deleteBtn         = document.createElement("button");
         deleteBtn.textContent = "Delete";
-        deleteBtn.className = "deleteBtn";
+        deleteBtn.className   = "deleteBtn";
         return deleteBtn;
     },
 
-    createCompleteBtn() {
-        let completedBtn = document.createElement("button");
-        completedBtn.textContent = "Complete";
-        completedBtn.className ="completedBtn";
-        return completedBtn;
+    createCheckBox() {
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "completedCheckBox";
+        return checkbox;
     },
 
     createPriorityBtn() {
-        let priorityBtn = document.createElement("button");
+        let priorityBtn         = document.createElement("button");
         priorityBtn.textContent = "Priority";
-        priorityBtn.className = "priority";
+        priorityBtn.className   = "priorityBtn";
         return priorityBtn;
-    },
-
-    createNotCompleteBtn() {
-        let notCompletedBtn = document.createElement("button");
-        notCompletedBtn.textContent = "Mark as Todo";
-        notCompletedBtn.className ="notCompletedBtn";
-        return notCompletedBtn;
     },
 
     setupEventListeners() {
         this.todoUl.addEventListener("click", event => {
-            let elementClicked = event.target;
-            let ul = "todoUl";
+            let elementClicked       = event.target;
+            let elementParentIdValue = parseInt(elementClicked.parentNode.id);
+            let ul                   = "todoUl";
 
-            if(elementClicked.className === "deleteBtn"){
-                handlers.deleteTodo(ul,parseInt(elementClicked.parentNode.id));
-            } else if(elementClicked.className === "completedBtn"){
-                handlers.toggleCompleted(ul,parseInt(elementClicked.parentNode.id));
-            } else if(elementClicked.className === "priority"){
-                handlers.makeTodoPriority(parseInt(elementClicked.parentNode.id));
+            if(elementClicked.className === "deleteBtn") {
+                handlers.deleteTodo(ul, elementParentIdValue);
+            } else if(elementClicked.checked) {
+                handlers.toggleCompleted(ul, elementParentIdValue);
+            } else if(elementClicked.className === "priorityBtn") {
+                handlers.makeTodoPriority(elementParentIdValue);
             }
         });
 
         this.completedUl.addEventListener("click", event => {
             let elementClicked = event.target;
-            let ul = "completedUl";
-            let position = elementClicked.parentNode.id.substr(10);
+            let ul             = "completedUl";
+            let position       = elementClicked.parentNode.id.substr(10);
 
-            if(elementClicked.className === "deleteBtn"){
-                handlers.deleteTodo(ul,position);
-            } else if(elementClicked.className === "notCompletedBtn"){
+            if(elementClicked.className === "deleteBtn") {
+                handlers.deleteTodo(ul, position);
+            } else if(elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
             }
         });
