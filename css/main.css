@@ -3,74 +3,88 @@ body {
     background-color: #e4ffe6;
 }
 
-    .container-fluid {
-        padding: 0;
-        margin: 0 auto;
-        width: 40%;
-    }
+.container-fluid {
+    padding: 0;
+    margin: 0 auto;
+    width: 40%;
+}
 
-    .container {
-        margin: 2em 0 2em 0;
-        padding: 0;
-        background-color: #b5cbb7;
-        min-height: 600px;
-        border-radius: 5px;
+.container {
+    margin: 2em 0 2em 0;
+    padding: 0;
+    background-color: #b5cbb7;
+    min-height: 600px;
+    border-radius: 5px;
 
-    }
+}
 
-    .outerHeader {
-        background-color: #ff8207;
-        padding-bottom: 25px;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
-    }
+.outerHeader {
+    background-color: #ff8207;
+    padding-bottom: 25px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
 
-    h1 {
-        padding: 1em 0 .4em 0;
-        text-align: center;
-        font-size: 1.6em;
-        color: #ffffff;
-    }
+h1 {
+    padding: 1em 0 .4em 0;
+    text-align: center;
+    font-size: 1.6em;
+    color: #ffffff;
+}
 
-    .header {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-    }
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
 
-    .inputArea {
-        /*border: 2px solid yellow;*/
-    }
+.inputArea {
+    /*border: 2px solid yellow;*/
+}
 
-    .inputArea button {
-        /*padding: 20px;*/
-    }
+.inputArea button {
+    /*padding: 20px;*/
+}
 
-    ul {
-        width: 95%;
-        padding: .4em 0 0.5em 0;
-        margin: 0 auto;
-    }
+ul {
+    width: 95%;
+    padding: .4em 0 0.5em 0;
+    margin: 0 auto;
+}
 
-    li {
-        margin: .5em 0;
-        list-style-type: none;
-        padding: .7em 1em 1.3em;
-        border-radius: 5px;
-        box-shadow: #8c8c8c 1px 1px 10px;
+li {
+    margin: .5em 0;
+    list-style-type: none;
+    padding: .7em 1em 1.3em;
+    border-radius: 5px;
+    box-shadow: #8c8c8c 1px 1px 10px;
+    position: relative;
 
-    }
+}
 
-    #todoUl li {
-        background-color: #ffffff;
-    }
+#todoUl li {
+    background-color: #ffffff;
+}
 
-    #completedUl li {
-        background-color: #ffffff;
-        text-decoration: line-through;
-        opacity: .6;
-    }
+#completedUl li {
+    background-color: #ffffff;
+    text-decoration: line-through;
+    opacity: .6;
+}
 
-    .checkBox {
-        margin-right: 1em;
-    }
+.checkBox {
+    margin-right: .5em;
+}
+
+.btnDiv {
+    width:145px;
+    display: flex;
+    justify-content: flex-end;
+    position: absolute;
+    right: 20px;
+    top: 13px;
+}
+
+#todoUl .btnDiv {
+    justify-content: space-around;
+}
