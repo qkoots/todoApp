@@ -1,10 +1,10 @@
 "use strict";
 
-//Create a method which will mark item as priority by clicking on i.e. a Star-icon.
-//When user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
-//Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
-//TODO line-through the completedTasks text (text-decoration prop CSS).
-//TODO Add item to task list by pressing enterKey.
+// Create a method which will mark item as priority by clicking on i.e. a Star-icon.
+// When user clicks on priority icons and if item is already marked as priority, the priority class and attributes should be removed.
+// Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
+// Line-through the completedTasks text (text-decoration prop CSS).
+// Add item to task list by pressing enterKey.
 //TODO View option to only see the priority items.
 //Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
@@ -12,7 +12,6 @@
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
 //TODO Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
 //TODO Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
-//TODO The priorityBtn of tasks in completedListUl should not be displayed when page is refresh/reloaded.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
 //TODO Replace icons using font awesome icons.
@@ -85,10 +84,8 @@ var lists = {
 
 // Handlers for the events the user triggers.
 var handlers = {
-    addTodo: function addTodo() {
-        var addTodoInputValue = document.getElementById("addTodoValueInput");
-        lists.addTodo(addTodoInputValue.value);
-        addTodoInputValue.value = "";
+    addTodo: function addTodo(value) {
+        lists.addTodo(value);
         view.displayTodos();
     },
     deleteTodo: function deleteTodo(ul, position) {
@@ -184,6 +181,16 @@ var view = {
         return priorityBtn;
     },
     setupEventListeners: function setupEventListeners() {
+
+        var addTodoInputValue = document.getElementById("addTodoValueInput");
+
+        addTodoInputValue.addEventListener("keyup", function (event) {
+            if (event.key === "Enter" && addTodoInputValue.value !== "") {
+                handlers.addTodo(addTodoInputValue.value);
+                addTodoInputValue.value = "";
+            }
+        });
+
         this.todoUl.addEventListener("click", function (event) {
             var elementClicked = event.target;
             var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
