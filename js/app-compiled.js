@@ -144,7 +144,9 @@ var view = {
             completedLi.id = "completed-" + position;
             completedLi.textContent = todo.todoTitle;
             todo.completed = !todo.completed;
-            completedLi.prepend(_this3.createCheckBox());
+            var checkbox = _this3.createCheckBox();
+            checkbox.checked = true;
+            completedLi.prepend(checkbox);
             completedLi.appendChild(_this3.createDeleteBtn());
             _this3.completedUl.appendChild(completedLi);
         }, this);
@@ -189,7 +191,7 @@ var view = {
 
             if (elementClicked.className === "deleteBtn") {
                 handlers.deleteTodo(ul, position);
-            } else if (elementClicked.checked) {
+            } else if (!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
             }
         });
