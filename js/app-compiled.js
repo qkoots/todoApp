@@ -129,8 +129,13 @@ var view = {
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
             todoLi.prepend(_this2.createCheckBox());
-            todoLi.appendChild(_this2.createPriorityBtn());
-            todoLi.appendChild(_this2.createDeleteBtn());
+
+            var btnDiv = _this2.createBtnDiv();
+            btnDiv.appendChild(_this2.createPriorityBtn());
+            btnDiv.appendChild(_this2.createDeleteBtn());
+
+            todoLi.appendChild(btnDiv);
+            //todoLi.appendChild();
             _this2.todoUl.appendChild(todoLi);
         }, this);
     },
@@ -147,9 +152,18 @@ var view = {
             var checkbox = _this3.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
-            completedLi.appendChild(_this3.createDeleteBtn());
+
+            var btnDiv = _this3.createBtnDiv();
+            btnDiv.appendChild(_this3.createDeleteBtn());
+
+            completedLi.appendChild(btnDiv);
             _this3.completedUl.appendChild(completedLi);
         }, this);
+    },
+    createBtnDiv: function createBtnDiv() {
+        var btnDiv = document.createElement("div");
+        btnDiv.className = "btnDiv";
+        return btnDiv;
     },
     createDeleteBtn: function createDeleteBtn() {
         var deleteBtn = document.createElement("button");
@@ -172,13 +186,13 @@ var view = {
     setupEventListeners: function setupEventListeners() {
         this.todoUl.addEventListener("click", function (event) {
             var elementClicked = event.target;
-            var elementParentIdValue = parseInt(elementClicked.parentNode.id);
+            var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             var ul = "todoUl";
 
             if (elementClicked.className === "deleteBtn") {
                 handlers.deleteTodo(ul, elementParentIdValue);
             } else if (elementClicked.checked) {
-                handlers.toggleCompleted(ul, elementParentIdValue);
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             } else if (elementClicked.className === "priorityBtn") {
                 handlers.makeTodoPriority(elementParentIdValue);
             }

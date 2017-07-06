@@ -49,7 +49,7 @@ const lists = {
         } else {
             let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
-            removeTodoFromCurrentPosition.forEach(todo=> {
+            removeTodoFromCurrentPosition.forEach(todo => {
                 this.addTodo(todo.todoTitle, true);
             }, this);
         }
@@ -128,8 +128,13 @@ const view = {
             todoLi.id          = position;
             todoLi.textContent = todo.todoTitle;
             todoLi.prepend(this.createCheckBox());
-            todoLi.appendChild(this.createPriorityBtn());
-            todoLi.appendChild(this.createDeleteBtn());
+
+            let btnDiv = this.createBtnDiv();
+            btnDiv.appendChild(this.createPriorityBtn());
+            btnDiv.appendChild(this.createDeleteBtn());
+
+            todoLi.appendChild(btnDiv);
+            //todoLi.appendChild();
             this.todoUl.appendChild(todoLi);
         }, this);
     },
@@ -145,9 +150,19 @@ const view = {
             let checkbox = this.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
-            completedLi.appendChild(this.createDeleteBtn());
+
+            let btnDiv = this.createBtnDiv();
+            btnDiv.appendChild(this.createDeleteBtn());
+
+            completedLi.appendChild(btnDiv);
             this.completedUl.appendChild(completedLi);
         }, this);
+    },
+
+    createBtnDiv(){
+        let btnDiv = document.createElement("div");
+        btnDiv.className = "btnDiv";
+        return btnDiv;
     },
 
     createDeleteBtn() {
@@ -174,13 +189,13 @@ const view = {
     setupEventListeners() {
         this.todoUl.addEventListener("click", event => {
             let elementClicked       = event.target;
-            let elementParentIdValue = parseInt(elementClicked.parentNode.id);
+            let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             let ul                   = "todoUl";
 
             if(elementClicked.className === "deleteBtn") {
                 handlers.deleteTodo(ul, elementParentIdValue);
             } else if(elementClicked.checked) {
-                handlers.toggleCompleted(ul, elementParentIdValue);
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             } else if(elementClicked.className === "priorityBtn") {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
