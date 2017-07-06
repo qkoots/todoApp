@@ -12,7 +12,7 @@
 //TODO Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
-//TODO Replace icons using font awesome icons.
+// Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
 
@@ -131,7 +131,6 @@ const view = {
             btnDiv.appendChild(this.createDeleteBtn());
 
             todoLi.appendChild(btnDiv);
-            //todoLi.appendChild();
             this.todoUl.appendChild(todoLi);
         }, this);
     },
@@ -163,9 +162,9 @@ const view = {
     },
 
     createDeleteBtn() {
-        let deleteBtn         = document.createElement("button");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.className   = "deleteBtn";
+        let deleteBtn         = document.createElement("i");
+        deleteBtn.classList.add("deleteBtn","fa", "fa-trash-o","fa-fw", "fa-2x");
+        deleteBtn.setAttribute("aria-hidden","true");
         return deleteBtn;
     },
 
@@ -177,9 +176,9 @@ const view = {
     },
 
     createPriorityBtn() {
-        let priorityBtn         = document.createElement("button");
-        priorityBtn.textContent = "Priority";
-        priorityBtn.className   = "priorityBtn";
+        let priorityBtn         = document.createElement("i");
+        priorityBtn.classList.add("priorityBtn","fa","fa-star-o","fa-fw","fa-2x");
+        priorityBtn.setAttribute("aria-hidden","true");
         return priorityBtn;
     },
 
@@ -199,11 +198,11 @@ const view = {
             let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             let ul                   = "todoUl";
 
-            if(elementClicked.className === "deleteBtn") {
+            if(elementClicked.classList.contains("deleteBtn")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
             } else if(elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            } else if(elementClicked.className === "priorityBtn") {
+            } else if(elementClicked.classList.contains("priorityBtn")) {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
         });
