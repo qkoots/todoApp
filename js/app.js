@@ -4,7 +4,7 @@
 // Line-through the completedTasks text (text-decoration prop CSS).
 // Add item to task list by pressing enterKey.
 //TODO View option to only see the priority items.
-//Empty input form after items has been added.
+// Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
@@ -125,11 +125,15 @@ const view = {
             todoLi.id          = position;
             todoLi.textContent = todo.todoTitle;
             todoLi.prepend(this.createCheckBox());
-
             let btnDiv = this.createBtnDiv();
-            btnDiv.appendChild(this.createPriorityBtn());
-            btnDiv.appendChild(this.createDeleteBtn());
 
+            if(todo.priority === false){
+                btnDiv.appendChild(this.createPriorityInitialIcon());
+            } else {
+                btnDiv.appendChild(this.createPriorityIcon());
+            }
+
+            btnDiv.appendChild(this.createDeleteIcon());
             todoLi.appendChild(btnDiv);
             this.todoUl.appendChild(todoLi);
         }, this);
@@ -148,7 +152,7 @@ const view = {
             completedLi.prepend(checkbox);
 
             let btnDiv = this.createBtnDiv();
-            btnDiv.appendChild(this.createDeleteBtn());
+            btnDiv.appendChild(this.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
             this.completedUl.appendChild(completedLi);
@@ -161,7 +165,7 @@ const view = {
         return btnDiv;
     },
 
-    createDeleteBtn() {
+    createDeleteIcon() {
         let deleteBtn         = document.createElement("i");
         deleteBtn.classList.add("deleteBtn","fa", "fa-trash-o","fa-fw", "fa-2x");
         deleteBtn.setAttribute("aria-hidden","true");
@@ -175,9 +179,16 @@ const view = {
         return checkbox;
     },
 
-    createPriorityBtn() {
+    createPriorityInitialIcon() {
         let priorityBtn         = document.createElement("i");
         priorityBtn.classList.add("priorityBtn","fa","fa-star-o","fa-fw","fa-2x");
+        priorityBtn.setAttribute("aria-hidden","true");
+        return priorityBtn;
+    },
+
+    createPriorityIcon() {
+        let priorityBtn         = document.createElement("i");
+        priorityBtn.classList.add("priorityBtn","fa","fa-star","fa-fw","fa-2x");
         priorityBtn.setAttribute("aria-hidden","true");
         return priorityBtn;
     },
@@ -186,7 +197,7 @@ const view = {
 
         let addTodoInputValue = document.getElementById("addTodoValueInput");
 
-        addTodoInputValue.addEventListener("keyup", (event) => {
+        addTodoInputValue.addEventListener("keyup", event => {
             if(event.key === "Enter" && addTodoInputValue.value !== ""){
                 handlers.addTodo(addTodoInputValue.value);
                 addTodoInputValue.value = "";

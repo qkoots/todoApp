@@ -6,7 +6,7 @@
 // Line-through the completedTasks text (text-decoration prop CSS).
 // Add item to task list by pressing enterKey.
 //TODO View option to only see the priority items.
-//Empty input form after items has been added.
+// Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
@@ -126,11 +126,15 @@ var view = {
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
             todoLi.prepend(_this2.createCheckBox());
-
             var btnDiv = _this2.createBtnDiv();
-            btnDiv.appendChild(_this2.createPriorityBtn());
-            btnDiv.appendChild(_this2.createDeleteBtn());
 
+            if (todo.priority === false) {
+                btnDiv.appendChild(_this2.createPriorityInitialIcon());
+            } else {
+                btnDiv.appendChild(_this2.createPriorityIcon());
+            }
+
+            btnDiv.appendChild(_this2.createDeleteIcon());
             todoLi.appendChild(btnDiv);
             _this2.todoUl.appendChild(todoLi);
         }, this);
@@ -150,7 +154,7 @@ var view = {
             completedLi.prepend(checkbox);
 
             var btnDiv = _this3.createBtnDiv();
-            btnDiv.appendChild(_this3.createDeleteBtn());
+            btnDiv.appendChild(_this3.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
             _this3.completedUl.appendChild(completedLi);
@@ -161,7 +165,7 @@ var view = {
         btnDiv.className = "btnDiv";
         return btnDiv;
     },
-    createDeleteBtn: function createDeleteBtn() {
+    createDeleteIcon: function createDeleteIcon() {
         var deleteBtn = document.createElement("i");
         deleteBtn.classList.add("deleteBtn", "fa", "fa-trash-o", "fa-fw", "fa-2x");
         deleteBtn.setAttribute("aria-hidden", "true");
@@ -173,9 +177,15 @@ var view = {
         checkbox.className = "checkBox";
         return checkbox;
     },
-    createPriorityBtn: function createPriorityBtn() {
+    createPriorityInitialIcon: function createPriorityInitialIcon() {
         var priorityBtn = document.createElement("i");
         priorityBtn.classList.add("priorityBtn", "fa", "fa-star-o", "fa-fw", "fa-2x");
+        priorityBtn.setAttribute("aria-hidden", "true");
+        return priorityBtn;
+    },
+    createPriorityIcon: function createPriorityIcon() {
+        var priorityBtn = document.createElement("i");
+        priorityBtn.classList.add("priorityBtn", "fa", "fa-star", "fa-fw", "fa-2x");
         priorityBtn.setAttribute("aria-hidden", "true");
         return priorityBtn;
     },
