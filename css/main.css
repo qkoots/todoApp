@@ -15,7 +15,6 @@ body {
     background-color: #b5cbb7;
     min-height: 600px;
     border-radius: 5px;
-
 }
 
 .outerHeader {
@@ -59,7 +58,6 @@ li {
     border-radius: 5px;
     box-shadow: #8c8c8c 1px 1px 10px;
     position: relative;
-
 }
 
 #todoUl li {
