@@ -10,10 +10,9 @@ body {
 }
 
 .container {
-    margin: 2em 0 2em 0;
+    margin: 2em 0 0;
     padding: 0;
     background-color: #b5cbb7;
-    min-height: 600px;
     border-radius: 5px;
 }
 
@@ -84,4 +83,13 @@ li {
 
 #todoUl .btnDiv {
     justify-content: space-around;
+}
+
+#footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #94aa96;
+    width: 100%;
+    height: 70px;
 }
