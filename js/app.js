@@ -3,7 +3,8 @@
 // Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
 // Line-through the completedTasks text (text-decoration prop CSS).
 // Add item to task list by pressing enterKey.
-//TODO View option to only see the priority items.
+// TODO View option to only see the priority items.
+//TODO Option to clear all completed items.
 // Empty input form after items has been added.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
@@ -15,6 +16,11 @@
 // Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
+
+
+// Bugs to fix:
+    //
+    // If there is no priority todoItem, view priorities button should be disabled.
 
 // Construct the lists object
 const lists = {
@@ -33,7 +39,7 @@ const lists = {
     },
 
     deletedTodo (ul, position) {
-        if(ul === "todoUl") {
+        if(ul === "todoUl" || ul === "priorityUl") {
             this.todos.splice(position, 1);
         } else {
             this.completedTodos.splice(position, 1);
@@ -48,7 +54,7 @@ const lists = {
         } else {
             let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
-            removeTodoFromCurrentPosition.forEach(todo => {
+            removeTodoFromCurrentPosition.forEach( todo => {
                 this.addTodo(todo.todoTitle, true);
             }, this);
         }
@@ -66,7 +72,7 @@ const lists = {
         });
     },
 
-    toggleNotCompleted (position) {
+    toggleNotCompleted(position) {
         let todo       = this.completedTodos[position];
         todo.completed = false;
 
@@ -76,7 +82,16 @@ const lists = {
             priority  : todo.priority
         });
     },
+
+    filterPriority(){
+       return this.todos.filter( todo => {
+            if(todo.priority !== false) {
+                return todo;
+            }
+        });
+    },
 };
+
 
 // Handlers for the events the user triggers.
 const handlers = {
@@ -111,14 +126,25 @@ const handlers = {
         view.displayTodos();
         view.displayCompletedTodos();
     },
+
+    displayAllTodos(){
+        view.displayTodos();
+        view.displayCompletedTodos();
+    },
+
+    filterPriority(){
+        view.displayPriorityTodos();
+    },
 };
 
 const view = {
     todoUl      : document.querySelector("#todoUl"),
+    priorityUl : document.querySelector("#priorityUl"),
     completedUl : document.querySelector("#completedUl"),
 
     displayTodos() {
         this.todoUl.innerHTML = "";
+        this.priorityUl.innerHTML = "";
 
         lists.todos.forEach((todo, position) => {
             let todoLi         = document.createElement("li");
@@ -139,8 +165,30 @@ const view = {
         }, this);
     },
 
+    displayPriorityTodos(){
+
+        this.todoUl.innerHTML = "";
+        this.completedUl.style.display = "none";
+
+        let todos = lists.filterPriority();
+
+        todos.forEach((todo, position) => {
+            let todoLi         = document.createElement("li");
+            todoLi.id          = position;
+            todoLi.textContent = todo.todoTitle;
+            todoLi.prepend(this.createCheckBox());
+            let btnDiv = this.createBtnDiv();
+
+            btnDiv.appendChild(this.createPriorityIcon());
+            btnDiv.appendChild(this.createDeleteIcon());
+            todoLi.appendChild(btnDiv);
+            this.priorityUl.appendChild(todoLi);
+        }, this);
+    },
+
     displayCompletedTodos() {
         this.completedUl.innerHTML = "";
+        this.priorityUl.innerHTML = "";
 
         lists.completedTodos.forEach((todo, position) => {
             let completedLi         = document.createElement("li");
@@ -196,6 +244,8 @@ const view = {
     setupEventListeners() {
 
         let addTodoInputValue = document.getElementById("addTodoValueInput");
+        let toggleAllTodos = document.querySelector(".toggleAllTodos");
+        let filterPriorityTodos = document.querySelector(".togglePriorityTodos");
 
         addTodoInputValue.addEventListener("keyup", event => {
             if(event.key === "Enter" && addTodoInputValue.value !== ""){
@@ -203,6 +253,21 @@ const view = {
                 addTodoInputValue.value = "";
             }
         });
+
+        toggleAllTodos.addEventListener("click", () =>{
+            this.todoUl.style.display = "";
+            handlers.displayAllTodos();
+        });
+
+        let filterPriority = () => {
+            this.todoUl.style.display = "none";
+            let priorityTodoList = lists.filterPriority();
+            if(priorityTodoList.length > 0){
+                handlers.filterPriority();
+            }
+        };
+
+        filterPriorityTodos.addEventListener("click", filterPriority);
 
         this.todoUl.addEventListener("click", event => {
             let elementClicked       = event.target;
