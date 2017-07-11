@@ -59,7 +59,7 @@ li {
     position: relative;
 }
 
-#todoUl li {
+#todoUl li , #priorityUl li {
     background-color: #ffffff;
 }
 
