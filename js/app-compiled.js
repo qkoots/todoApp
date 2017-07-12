@@ -21,7 +21,7 @@
 
 
 // Bugs to fix:
-//
+// add eventListener on the "priorityUl". This way the functions on the buttons will work.
 // If there is no priority todoItem, view priorities button should be disabled.
 
 // Construct the lists object
@@ -29,6 +29,7 @@ var lists = {
 
     // Array of items
     todos: [],
+    priorityTodos: [],
     completedTodos: [],
 
     // Create method to add todoItems to the list
@@ -42,7 +43,7 @@ var lists = {
         });
     },
     deletedTodo: function deletedTodo(ul, position) {
-        if (ul === "todoUl" || ul === "priorityUl") {
+        if (ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
             this.completedTodos.splice(position, 1);
@@ -86,10 +87,16 @@ var lists = {
             priority: todo.priority
         });
     },
-    filterPriority: function filterPriority() {
+    filterPriorityTodos: function filterPriorityTodos() {
+        var _this2 = this;
+
         return this.todos.filter(function (todo) {
             if (todo.priority !== false) {
-                return todo;
+                return _this2.priorityTodos.unshift({
+                    todoTitle: todo.todoTitle,
+                    completed: todo.completed,
+                    priority: todo.priority
+                });
             }
         });
     }
@@ -127,8 +134,8 @@ var handlers = {
         view.displayTodos();
         view.displayCompletedTodos();
     },
-    filterPriority: function filterPriority() {
-        view.displayPriorityTodos();
+    filterPriorityTodos: function filterPriorityTodos() {
+        view.displayPriorityTodos(lists.filterPriorityTodos());
     }
 };
 
@@ -138,7 +145,7 @@ var view = {
     completedUl: document.querySelector("#completedUl"),
 
     displayTodos: function displayTodos() {
-        var _this2 = this;
+        var _this3 = this;
 
         this.todoUl.innerHTML = "";
         this.priorityUl.innerHTML = "";
@@ -147,43 +154,41 @@ var view = {
             var todoLi = document.createElement("li");
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.prepend(_this2.createCheckBox());
-            var btnDiv = _this2.createBtnDiv();
-
-            if (todo.priority === false) {
-                btnDiv.appendChild(_this2.createPriorityInitialIcon());
-            } else {
-                btnDiv.appendChild(_this2.createPriorityIcon());
-            }
-
-            btnDiv.appendChild(_this2.createDeleteIcon());
-            todoLi.appendChild(btnDiv);
-            _this2.todoUl.appendChild(todoLi);
-        }, this);
-    },
-    displayPriorityTodos: function displayPriorityTodos() {
-        var _this3 = this;
-
-        this.todoUl.innerHTML = "";
-        this.completedUl.style.display = "none";
-
-        var todos = lists.filterPriority();
-
-        todos.forEach(function (todo, position) {
-            var todoLi = document.createElement("li");
-            todoLi.id = position;
-            todoLi.textContent = todo.todoTitle;
             todoLi.prepend(_this3.createCheckBox());
             var btnDiv = _this3.createBtnDiv();
 
-            btnDiv.appendChild(_this3.createPriorityIcon());
+            if (todo.priority === false) {
+                btnDiv.appendChild(_this3.createPriorityInitialIcon());
+            } else {
+                btnDiv.appendChild(_this3.createPriorityIcon());
+            }
+
             btnDiv.appendChild(_this3.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this3.priorityUl.appendChild(todoLi);
+            _this3.todoUl.appendChild(todoLi);
+        }, this);
+    },
+    displayPriorityTodos: function displayPriorityTodos(priorityTodosList) {
+        var _this4 = this;
+
+        this.priorityUl.innerHTML = "";
+        this.completedUl.style.display = "none";
+
+        priorityTodosList.forEach(function (todo, position) {
+            var todoLi = document.createElement("li");
+            todoLi.id = position;
+            todoLi.textContent = todo.todoTitle;
+            todoLi.prepend(_this4.createCheckBox());
+            var btnDiv = _this4.createBtnDiv();
+
+            btnDiv.appendChild(_this4.createPriorityIcon());
+            btnDiv.appendChild(_this4.createDeleteIcon());
+            todoLi.appendChild(btnDiv);
+            _this4.priorityUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
-        var _this4 = this;
+        var _this5 = this;
 
         this.completedUl.innerHTML = "";
         this.priorityUl.innerHTML = "";
@@ -193,15 +198,15 @@ var view = {
             completedLi.id = "completed-" + position;
             completedLi.textContent = todo.todoTitle;
             todo.completed = !todo.completed;
-            var checkbox = _this4.createCheckBox();
+            var checkbox = _this5.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
 
-            var btnDiv = _this4.createBtnDiv();
-            btnDiv.appendChild(_this4.createDeleteIcon());
+            var btnDiv = _this5.createBtnDiv();
+            btnDiv.appendChild(_this5.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
-            _this4.completedUl.appendChild(completedLi);
+            _this5.completedUl.appendChild(completedLi);
         }, this);
     },
     createBtnDiv: function createBtnDiv() {
@@ -234,11 +239,11 @@ var view = {
         return priorityBtn;
     },
     setupEventListeners: function setupEventListeners() {
-        var _this5 = this;
+        var _this6 = this;
 
-        var addTodoInputValue = document.getElementById("addTodoValueInput");
-        var toggleAllTodos = document.querySelector(".toggleAllTodos");
-        var filterPriorityTodos = document.querySelector(".togglePriorityTodos");
+        var addTodoInputValue = document.querySelector("#addTodoValueInput");
+        var toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
+        var filterPriorityTodosBtn = document.querySelector(".togglePriorityTodos");
 
         addTodoInputValue.addEventListener("keyup", function (event) {
             if (event.key === "Enter" && addTodoInputValue.value !== "") {
@@ -247,20 +252,20 @@ var view = {
             }
         });
 
-        toggleAllTodos.addEventListener("click", function () {
-            _this5.todoUl.style.display = "";
+        toggleAllTodosBtn.addEventListener("click", function () {
+            _this6.todoUl.style.display = "";
             handlers.displayAllTodos();
         });
 
-        var filterPriority = function filterPriority() {
-            _this5.todoUl.style.display = "none";
-            var priorityTodoList = lists.filterPriority();
+        var filterPriorityTodos = function filterPriorityTodos() {
+            _this6.todoUl.style.display = "none";
+            var priorityTodoList = lists.filterPriorityTodos();
             if (priorityTodoList.length > 0) {
-                handlers.filterPriority();
+                handlers.filterPriorityTodos();
             }
         };
 
-        filterPriorityTodos.addEventListener("click", filterPriority);
+        filterPriorityTodosBtn.addEventListener("click", filterPriorityTodos);
 
         this.todoUl.addEventListener("click", function (event) {
             var elementClicked = event.target;
@@ -274,6 +279,21 @@ var view = {
             } else if (elementClicked.classList.contains("priorityBtn")) {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
+        });
+
+        this.priorityUl.addEventListener("click", function (event) {
+            var elementClicked = event.target;
+            var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
+            var ul = "priorityUl";
+
+            if (elementClicked.classList.contains("deleteBtn")) {
+                handlers.deleteTodo(ul, elementParentIdValue);
+            }
+            // else if(elementClicked.checked) {
+            //    handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+            //} else if(elementClicked.classList.contains("priorityBtn")) {
+            //    handlers.makeTodoPriority(elementParentIdValue);
+            //}
         });
 
         this.completedUl.addEventListener("click", function (event) {
