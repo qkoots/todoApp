@@ -19,7 +19,7 @@
 
 
 // Bugs to fix:
-    //
+    // add eventListener on the "priorityUl". This way the functions on the buttons will work.
     // If there is no priority todoItem, view priorities button should be disabled.
 
 // Construct the lists object
@@ -27,6 +27,7 @@ const lists = {
 
     // Array of items
     todos          : [],
+    priorityTodos : [],
     completedTodos : [],
 
     // Create method to add todoItems to the list
@@ -39,7 +40,7 @@ const lists = {
     },
 
     deletedTodo (ul, position) {
-        if(ul === "todoUl" || ul === "priorityUl") {
+        if(ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
             this.completedTodos.splice(position, 1);
@@ -83,15 +84,18 @@ const lists = {
         });
     },
 
-    filterPriority(){
+    filterPriorityTodos(){
        return this.todos.filter( todo => {
             if(todo.priority !== false) {
-                return todo;
+               return this.priorityTodos.unshift({
+                    todoTitle : todo.todoTitle,
+                    completed : todo.completed,
+                    priority  : todo.priority
+                });
             }
         });
     },
 };
-
 
 // Handlers for the events the user triggers.
 const handlers = {
@@ -132,8 +136,8 @@ const handlers = {
         view.displayCompletedTodos();
     },
 
-    filterPriority(){
-        view.displayPriorityTodos();
+    filterPriorityTodos(){
+        view.displayPriorityTodos(lists.filterPriorityTodos());
     },
 };
 
@@ -165,14 +169,11 @@ const view = {
         }, this);
     },
 
-    displayPriorityTodos(){
-
-        this.todoUl.innerHTML = "";
+    displayPriorityTodos(priorityTodosList){
+        this.priorityUl.innerHTML = "";
         this.completedUl.style.display = "none";
 
-        let todos = lists.filterPriority();
-
-        todos.forEach((todo, position) => {
+        priorityTodosList.forEach((todo, position) => {
             let todoLi         = document.createElement("li");
             todoLi.id          = position;
             todoLi.textContent = todo.todoTitle;
@@ -243,9 +244,9 @@ const view = {
 
     setupEventListeners() {
 
-        let addTodoInputValue = document.getElementById("addTodoValueInput");
-        let toggleAllTodos = document.querySelector(".toggleAllTodos");
-        let filterPriorityTodos = document.querySelector(".togglePriorityTodos");
+        let addTodoInputValue = document.querySelector("#addTodoValueInput");
+        let toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
+        let filterPriorityTodosBtn = document.querySelector(".togglePriorityTodos");
 
         addTodoInputValue.addEventListener("keyup", event => {
             if(event.key === "Enter" && addTodoInputValue.value !== ""){
@@ -254,20 +255,20 @@ const view = {
             }
         });
 
-        toggleAllTodos.addEventListener("click", () =>{
+        toggleAllTodosBtn.addEventListener("click", () =>{
             this.todoUl.style.display = "";
             handlers.displayAllTodos();
         });
 
-        let filterPriority = () => {
+        let filterPriorityTodos = () => {
             this.todoUl.style.display = "none";
-            let priorityTodoList = lists.filterPriority();
+            let priorityTodoList = lists.filterPriorityTodos();
             if(priorityTodoList.length > 0){
-                handlers.filterPriority();
+                handlers.filterPriorityTodos();
             }
         };
 
-        filterPriorityTodos.addEventListener("click", filterPriority);
+        filterPriorityTodosBtn.addEventListener("click", filterPriorityTodos);
 
         this.todoUl.addEventListener("click", event => {
             let elementClicked       = event.target;
@@ -281,6 +282,21 @@ const view = {
             } else if(elementClicked.classList.contains("priorityBtn")) {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
+        });
+
+        this.priorityUl.addEventListener("click", event => {
+            let elementClicked       = event.target;
+            let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
+            let ul                   = "priorityUl";
+
+            if(elementClicked.classList.contains("deleteBtn")) {
+                handlers.deleteTodo(ul, elementParentIdValue);
+            }
+            // else if(elementClicked.checked) {
+            //    handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+            //} else if(elementClicked.classList.contains("priorityBtn")) {
+            //    handlers.makeTodoPriority(elementParentIdValue);
+            //}
         });
 
         this.completedUl.addEventListener("click", event => {
