@@ -5,9 +5,12 @@
 // Create a function so items in the completed list can be pushed back to the todoListUl (i.e when user accidentally click complete button).
 // Line-through the completedTasks text (text-decoration prop CSS).
 // Add item to task list by pressing enterKey.
-// TODO View option to only see the priority items.
-//TODO Option to clear all completed items.
+// View option to only see the priority items.
+// Option to clear all completed items.
 // Empty input form after items has been added.
+// Replace icons using font awesome icons.
+
+//TODO When app is init, focus must be on the input.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
@@ -15,14 +18,9 @@
 //TODO Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
-// Replace icons using font awesome icons.
 //TODO Users should be able to sort tasks alphabetically
 //TODO Users should be able to sort tasks by date
 
-
-// Bugs to fix:
-// add eventListener on the "priorityUl". This way the functions on the buttons will work.
-// If there is no priority todoItem, view priorities button should be disabled.
 
 // Construct the lists object
 var lists = {
@@ -48,6 +46,9 @@ var lists = {
         } else {
             this.completedTodos.splice(position, 1);
         }
+    },
+    clearAllCompletedTodos: function clearAllCompletedTodos() {
+        this.completedTodos.splice(0);
     },
     makeTodoPriority: function makeTodoPriority(position) {
         var _this = this;
@@ -133,6 +134,9 @@ var handlers = {
     displayAllTodos: function displayAllTodos() {
         view.displayTodos();
         view.displayCompletedTodos();
+    },
+    clearAllCompletedTodos: function clearAllCompletedTodos() {
+        lists.clearAllCompletedTodos();
     },
     filterPriorityTodos: function filterPriorityTodos() {
         view.displayPriorityTodos(lists.filterPriorityTodos());
@@ -242,6 +246,7 @@ var view = {
         var addTodoInputValue = document.querySelector("#addTodoValueInput");
         var toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
         var filterPriorityTodosBtn = document.querySelector(".togglePriorityTodos");
+        var clearCompletedTodos = document.querySelector(".clearCompletedTodos");
 
         addTodoInputValue.addEventListener("keyup", function (event) {
             if (event.key === "Enter" && addTodoInputValue.value !== "") {
@@ -252,6 +257,11 @@ var view = {
 
         toggleAllTodosBtn.addEventListener("click", function () {
             _this6.todoUl.style.display = "";
+            handlers.displayAllTodos();
+        });
+
+        clearCompletedTodos.addEventListener("click", function () {
+            handlers.clearAllCompletedTodos();
             handlers.displayAllTodos();
         });
 
@@ -273,16 +283,23 @@ var view = {
             var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             var ul = "todoUl";
 
-            if (elementClicked.classList.contains("deleteBtn")) {
+            if (elementClicked.classList.contains("deleteBtn") && _this6.todoUl.classList.contains("priority-active")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
-            } else if (elementClicked.checked && _this6.todoUl.classList.contains("priority-active")) {
+                filterPriorityTodos();
+            } else if (elementClicked.classList.contains("deleteBtn")) {
+                handlers.deleteTodo(ul, elementParentIdValue);
+            }
+
+            if (elementClicked.checked && _this6.todoUl.classList.contains("priority-active")) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-                var priorityTodoList = lists.filterPriorityTodos();
-                if (priorityTodoList !== 0) {
-                    filterPriorityTodos();
-                }
+                filterPriorityTodos();
             } else if (elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+            }
+
+            if (elementClicked.classList.contains("priorityBtn") && _this6.todoUl.classList.contains("priority-active")) {
+                handlers.makeTodoPriority(elementParentIdValue);
+                filterPriorityTodos();
             } else if (elementClicked.classList.contains("priorityBtn")) {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
