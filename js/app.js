@@ -143,12 +143,11 @@ const handlers = {
 
 const view = {
     todoUl      : document.querySelector("#todoUl"),
-    priorityUl : document.querySelector("#priorityUl"),
     completedUl : document.querySelector("#completedUl"),
 
     displayTodos() {
         this.todoUl.innerHTML = "";
-        this.priorityUl.innerHTML = "";
+        this.completedUl.style.display = "";
 
         lists.todos.forEach((todo, position) => {
             let todoLi         = document.createElement("li");
@@ -170,7 +169,7 @@ const view = {
     },
 
     displayPriorityTodos(priorityTodosList){
-        this.priorityUl.innerHTML = "";
+        this.todoUl.innerHTML = "";
         this.completedUl.style.display = "none";
 
         priorityTodosList.forEach((todo, position) => {
@@ -183,15 +182,14 @@ const view = {
             btnDiv.appendChild(this.createPriorityIcon());
             btnDiv.appendChild(this.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            this.priorityUl.appendChild(todoLi);
+            this.todoUl.appendChild(todoLi);
         }, this);
     },
 
     displayCompletedTodos() {
         this.completedUl.innerHTML = "";
-        this.priorityUl.innerHTML = "";
 
-        lists.completedTodos.forEach((todo, position) => {
+        lists.completedTodos.forEach( (todo, position) => {
             let completedLi         = document.createElement("li");
             completedLi.id          = `completed-${position}`;
             completedLi.textContent = todo.todoTitle;
@@ -243,7 +241,6 @@ const view = {
     },
 
     setupEventListeners() {
-
         let addTodoInputValue = document.querySelector("#addTodoValueInput");
         let toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
         let filterPriorityTodosBtn = document.querySelector(".togglePriorityTodos");
@@ -261,9 +258,12 @@ const view = {
         });
 
         let filterPriorityTodos = () => {
-            this.todoUl.style.display = "none";
             let priorityTodoList = lists.filterPriorityTodos();
-            if(priorityTodoList.length > 0){
+            if(priorityTodoList.length === 0) {
+                this.todoUl.classList.remove("priority-active");
+                handlers.displayAllTodos();
+            } else if (priorityTodoList.length > 0){
+                this.todoUl.classList.add("priority-active");
                 handlers.filterPriorityTodos();
             }
         };
@@ -277,26 +277,20 @@ const view = {
 
             if(elementClicked.classList.contains("deleteBtn")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
+
+            } else if(elementClicked.checked && this.todoUl.classList.contains("priority-active")) {
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+                let priorityTodoList = lists.filterPriorityTodos();
+                if(priorityTodoList !== 0) {
+                    filterPriorityTodos();
+                }
             } else if(elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            } else if(elementClicked.classList.contains("priorityBtn")) {
+            }
+
+            else if(elementClicked.classList.contains("priorityBtn")) {
                 handlers.makeTodoPriority(elementParentIdValue);
             }
-        });
-
-        this.priorityUl.addEventListener("click", event => {
-            let elementClicked       = event.target;
-            let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
-            let ul                   = "priorityUl";
-
-            if(elementClicked.classList.contains("deleteBtn")) {
-                handlers.deleteTodo(ul, elementParentIdValue);
-            }
-            // else if(elementClicked.checked) {
-            //    handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            //} else if(elementClicked.classList.contains("priorityBtn")) {
-            //    handlers.makeTodoPriority(elementParentIdValue);
-            //}
         });
 
         this.completedUl.addEventListener("click", event => {
@@ -304,7 +298,7 @@ const view = {
             let ul             = "completedUl";
             let position       = elementClicked.parentNode.id.substr(10);
 
-            if(elementClicked.className === "deleteBtn") {
+            if(elementClicked.classList.contains("deleteBtn")){
                 handlers.deleteTodo(ul, position);
             } else if(!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);

@@ -141,14 +141,13 @@ var handlers = {
 
 var view = {
     todoUl: document.querySelector("#todoUl"),
-    priorityUl: document.querySelector("#priorityUl"),
     completedUl: document.querySelector("#completedUl"),
 
     displayTodos: function displayTodos() {
         var _this3 = this;
 
         this.todoUl.innerHTML = "";
-        this.priorityUl.innerHTML = "";
+        this.completedUl.style.display = "";
 
         lists.todos.forEach(function (todo, position) {
             var todoLi = document.createElement("li");
@@ -171,7 +170,7 @@ var view = {
     displayPriorityTodos: function displayPriorityTodos(priorityTodosList) {
         var _this4 = this;
 
-        this.priorityUl.innerHTML = "";
+        this.todoUl.innerHTML = "";
         this.completedUl.style.display = "none";
 
         priorityTodosList.forEach(function (todo, position) {
@@ -184,14 +183,13 @@ var view = {
             btnDiv.appendChild(_this4.createPriorityIcon());
             btnDiv.appendChild(_this4.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this4.priorityUl.appendChild(todoLi);
+            _this4.todoUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
         var _this5 = this;
 
         this.completedUl.innerHTML = "";
-        this.priorityUl.innerHTML = "";
 
         lists.completedTodos.forEach(function (todo, position) {
             var completedLi = document.createElement("li");
@@ -258,9 +256,12 @@ var view = {
         });
 
         var filterPriorityTodos = function filterPriorityTodos() {
-            _this6.todoUl.style.display = "none";
             var priorityTodoList = lists.filterPriorityTodos();
-            if (priorityTodoList.length > 0) {
+            if (priorityTodoList.length === 0) {
+                _this6.todoUl.classList.remove("priority-active");
+                handlers.displayAllTodos();
+            } else if (priorityTodoList.length > 0) {
+                _this6.todoUl.classList.add("priority-active");
                 handlers.filterPriorityTodos();
             }
         };
@@ -274,6 +275,12 @@ var view = {
 
             if (elementClicked.classList.contains("deleteBtn")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
+            } else if (elementClicked.checked && _this6.todoUl.classList.contains("priority-active")) {
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+                var priorityTodoList = lists.filterPriorityTodos();
+                if (priorityTodoList !== 0) {
+                    filterPriorityTodos();
+                }
             } else if (elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             } else if (elementClicked.classList.contains("priorityBtn")) {
@@ -281,27 +288,12 @@ var view = {
             }
         });
 
-        this.priorityUl.addEventListener("click", function (event) {
-            var elementClicked = event.target;
-            var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
-            var ul = "priorityUl";
-
-            if (elementClicked.classList.contains("deleteBtn")) {
-                handlers.deleteTodo(ul, elementParentIdValue);
-            }
-            // else if(elementClicked.checked) {
-            //    handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            //} else if(elementClicked.classList.contains("priorityBtn")) {
-            //    handlers.makeTodoPriority(elementParentIdValue);
-            //}
-        });
-
         this.completedUl.addEventListener("click", function (event) {
             var elementClicked = event.target;
             var ul = "completedUl";
             var position = elementClicked.parentNode.id.substr(10);
 
-            if (elementClicked.className === "deleteBtn") {
+            if (elementClicked.classList.contains("deleteBtn")) {
                 handlers.deleteTodo(ul, position);
             } else if (!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
