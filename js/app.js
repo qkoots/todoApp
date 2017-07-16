@@ -39,14 +39,14 @@ const lists = {
 
     storeTodosInLocalStorage() {
         const storage = localStorage;
-            this.todos.forEach( (todo,position) => {
-                let todoObj = {
-                    title : todo.todoTitle,
-                    completed : todo.completed,
-                    priority  : todo.priority,
-                };
-                storage.setItem(position, JSON.stringify(todoObj));
-            })
+        this.todos.forEach( (todo,position) => {
+            let todoObj = {
+                title : todo.todoTitle,
+                completed : todo.completed,
+                priority  : todo.priority,
+            };
+            storage.setItem(position, JSON.stringify(todoObj));
+        })
     },
 
     retrieveTodosFromStorage(){
@@ -59,17 +59,16 @@ const lists = {
 
     },
 
-    //removeTodoFromStorage(position) {
-    //    const storage = localStorage;
-    //
-    //    Object.keys(storage).forEach( key => {
-    //        let keyToNumber = parseInt(key);
-    //        console.log(keyToNumber,position);
-    //        if(keyToNumber === position) {
-    //            storage.removeItem(keyToNumber);
-    //        }
-    //    })
-    //},
+    removeTodoFromStorage(textValue) {
+        const storage = localStorage;
+
+        Object.keys(storage).forEach( key => {
+            let title = JSON.parse(storage[key]).title;
+            if(title === textValue){
+                storage.removeItem(key);
+            }
+        })
+    },
 
     deletedTodo (ul, position) {
         if(ul === "todoUl") {
@@ -138,8 +137,8 @@ const handlers = {
 
     addTodo(value) {
         lists.addTodo(value);
-        view.displayTodos();
         lists.storeTodosInLocalStorage();
+        view.displayTodos();
     },
 
     deleteTodo(ul, position){
@@ -152,6 +151,7 @@ const handlers = {
         lists.makeTodoPriority(position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.storeTodosInLocalStorage();
     },
 
     toggleCompleted(ul, position) {
@@ -181,9 +181,9 @@ const handlers = {
         view.displayPriorityTodos(lists.filterPriorityTodos());
     },
 
-    //removeTodoFromStorage(position) {
-    //    lists.removeTodoFromStorage(position)
-    //}
+    removeTodoFromStorage(textValue) {
+        lists.removeTodoFromStorage(textValue);
+    }
 
 };
 
@@ -197,8 +197,9 @@ const view = {
 
         lists.todos.forEach((todo, position) => {
             let todoLi         = document.createElement("li");
+            let textNode = document.createTextNode(todo.todoTitle);
             todoLi.id          = position;
-            todoLi.textContent = todo.todoTitle;
+            todoLi.appendChild(textNode);
             todoLi.prepend(this.createCheckBox());
             let btnDiv = this.createBtnDiv();
 
@@ -220,8 +221,9 @@ const view = {
 
         priorityTodosList.forEach((todo, position) => {
             let todoLi         = document.createElement("li");
+            let textNode = document.createTextNode(todo.todoTitle);
             todoLi.id          = position;
-            todoLi.textContent = todo.todoTitle;
+            todoLi.appendChild(textNode);
             todoLi.prepend(this.createCheckBox());
             let btnDiv = this.createBtnDiv();
 
@@ -330,8 +332,9 @@ const view = {
             if(elementClicked.classList.contains("deleteBtn") && this.todoUl.classList.contains("priority-active")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
                 filterPriorityTodos();
-
             } else if(elementClicked.classList.contains("deleteBtn")) {
+                let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
+                handlers.removeTodoFromStorage(textValue);
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
@@ -369,6 +372,3 @@ const view = {
 view.setupEventListeners();
 lists.retrieveTodosFromStorage();
 handlers.displayAllTodos();
-
-
-
