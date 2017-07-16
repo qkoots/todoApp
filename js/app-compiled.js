@@ -62,20 +62,16 @@ var lists = {
             _this.addTodo(todo.title, todo.completed, todo.priority);
         });
     },
+    removeTodoFromStorage: function removeTodoFromStorage(textValue) {
+        var storage = localStorage;
 
-
-    //removeTodoFromStorage(position) {
-    //    const storage = localStorage;
-    //
-    //    Object.keys(storage).forEach( key => {
-    //        let keyToNumber = parseInt(key);
-    //        console.log(keyToNumber,position);
-    //        if(keyToNumber === position) {
-    //            storage.removeItem(keyToNumber);
-    //        }
-    //    })
-    //},
-
+        Object.keys(storage).forEach(function (key) {
+            var title = JSON.parse(storage[key]).title;
+            if (title === textValue) {
+                storage.removeItem(key);
+            }
+        });
+    },
     deletedTodo: function deletedTodo(ul, position) {
         if (ul === "todoUl") {
             this.todos.splice(position, 1);
@@ -143,8 +139,8 @@ var lists = {
 var handlers = {
     addTodo: function addTodo(value) {
         lists.addTodo(value);
-        view.displayTodos();
         lists.storeTodosInLocalStorage();
+        view.displayTodos();
     },
     deleteTodo: function deleteTodo(ul, position) {
         lists.deletedTodo(ul, position);
@@ -155,6 +151,7 @@ var handlers = {
         lists.makeTodoPriority(position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.storeTodosInLocalStorage();
     },
     toggleCompleted: function toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
@@ -177,6 +174,9 @@ var handlers = {
     },
     filterPriorityTodos: function filterPriorityTodos() {
         view.displayPriorityTodos(lists.filterPriorityTodos());
+    },
+    removeTodoFromStorage: function removeTodoFromStorage(textValue) {
+        lists.removeTodoFromStorage(textValue);
     }
 };
 
@@ -192,8 +192,9 @@ var view = {
 
         lists.todos.forEach(function (todo, position) {
             var todoLi = document.createElement("li");
+            var textNode = document.createTextNode(todo.todoTitle);
             todoLi.id = position;
-            todoLi.textContent = todo.todoTitle;
+            todoLi.appendChild(textNode);
             todoLi.prepend(_this4.createCheckBox());
             var btnDiv = _this4.createBtnDiv();
 
@@ -216,8 +217,9 @@ var view = {
 
         priorityTodosList.forEach(function (todo, position) {
             var todoLi = document.createElement("li");
+            var textNode = document.createTextNode(todo.todoTitle);
             todoLi.id = position;
-            todoLi.textContent = todo.todoTitle;
+            todoLi.appendChild(textNode);
             todoLi.prepend(_this5.createCheckBox());
             var btnDiv = _this5.createBtnDiv();
 
@@ -324,6 +326,8 @@ var view = {
                 handlers.deleteTodo(ul, elementParentIdValue);
                 filterPriorityTodos();
             } else if (elementClicked.classList.contains("deleteBtn")) {
+                var textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
+                handlers.removeTodoFromStorage(textValue);
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
