@@ -32,14 +32,50 @@ var lists = {
 
     // Create method to add todoItems to the list
     addTodo: function addTodo(todoTitle) {
-        var priority = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var completed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var priority = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
         this.todos.unshift({
             todoTitle: todoTitle,
-            completed: false,
+            completed: completed,
             priority: priority
         });
     },
+    storeTodosInLocalStorage: function storeTodosInLocalStorage() {
+        var storage = localStorage;
+        this.todos.forEach(function (todo, position) {
+            var todoObj = {
+                title: todo.todoTitle,
+                completed: todo.completed,
+                priority: todo.priority
+            };
+            storage.setItem(position, JSON.stringify(todoObj));
+        });
+    },
+    retrieveTodosFromStorage: function retrieveTodosFromStorage() {
+        var _this = this;
+
+        var storage = localStorage;
+
+        Object.keys(storage).forEach(function (key) {
+            var todo = JSON.parse(storage.getItem(key));
+            _this.addTodo(todo.title, todo.completed, todo.priority);
+        });
+    },
+
+
+    //removeTodoFromStorage(position) {
+    //    const storage = localStorage;
+    //
+    //    Object.keys(storage).forEach( key => {
+    //        let keyToNumber = parseInt(key);
+    //        console.log(keyToNumber,position);
+    //        if(keyToNumber === position) {
+    //            storage.removeItem(keyToNumber);
+    //        }
+    //    })
+    //},
+
     deletedTodo: function deletedTodo(ul, position) {
         if (ul === "todoUl") {
             this.todos.splice(position, 1);
@@ -51,7 +87,7 @@ var lists = {
         this.completedTodos.splice(0);
     },
     makeTodoPriority: function makeTodoPriority(position) {
-        var _this = this;
+        var _this2 = this;
 
         var todo = this.todos[position];
 
@@ -61,7 +97,7 @@ var lists = {
             var removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
             removeTodoFromCurrentPosition.forEach(function (todo) {
-                _this.addTodo(todo.todoTitle, true);
+                _this2.addTodo(todo.todoTitle, todo.completed, true);
             }, this);
         }
     },
@@ -89,11 +125,11 @@ var lists = {
         });
     },
     filterPriorityTodos: function filterPriorityTodos() {
-        var _this2 = this;
+        var _this3 = this;
 
         return this.todos.filter(function (todo) {
             if (todo.priority !== false) {
-                return _this2.priorityTodos.unshift({
+                return _this3.priorityTodos.unshift({
                     todoTitle: todo.todoTitle,
                     completed: todo.completed,
                     priority: todo.priority
@@ -108,6 +144,7 @@ var handlers = {
     addTodo: function addTodo(value) {
         lists.addTodo(value);
         view.displayTodos();
+        lists.storeTodosInLocalStorage();
     },
     deleteTodo: function deleteTodo(ul, position) {
         lists.deletedTodo(ul, position);
@@ -148,7 +185,7 @@ var view = {
     completedUl: document.querySelector("#completedUl"),
 
     displayTodos: function displayTodos() {
-        var _this3 = this;
+        var _this4 = this;
 
         this.todoUl.innerHTML = "";
         this.completedUl.style.display = "";
@@ -157,22 +194,22 @@ var view = {
             var todoLi = document.createElement("li");
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.prepend(_this3.createCheckBox());
-            var btnDiv = _this3.createBtnDiv();
+            todoLi.prepend(_this4.createCheckBox());
+            var btnDiv = _this4.createBtnDiv();
 
             if (todo.priority === false) {
-                btnDiv.appendChild(_this3.createPriorityInitialIcon());
+                btnDiv.appendChild(_this4.createPriorityInitialIcon());
             } else {
-                btnDiv.appendChild(_this3.createPriorityIcon());
+                btnDiv.appendChild(_this4.createPriorityIcon());
             }
 
-            btnDiv.appendChild(_this3.createDeleteIcon());
+            btnDiv.appendChild(_this4.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this3.todoUl.appendChild(todoLi);
+            _this4.todoUl.appendChild(todoLi);
         }, this);
     },
     displayPriorityTodos: function displayPriorityTodos(priorityTodosList) {
-        var _this4 = this;
+        var _this5 = this;
 
         this.todoUl.innerHTML = "";
         this.completedUl.style.display = "none";
@@ -181,17 +218,17 @@ var view = {
             var todoLi = document.createElement("li");
             todoLi.id = position;
             todoLi.textContent = todo.todoTitle;
-            todoLi.prepend(_this4.createCheckBox());
-            var btnDiv = _this4.createBtnDiv();
+            todoLi.prepend(_this5.createCheckBox());
+            var btnDiv = _this5.createBtnDiv();
 
-            btnDiv.appendChild(_this4.createPriorityIcon());
-            btnDiv.appendChild(_this4.createDeleteIcon());
+            btnDiv.appendChild(_this5.createPriorityIcon());
+            btnDiv.appendChild(_this5.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this4.todoUl.appendChild(todoLi);
+            _this5.todoUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
-        var _this5 = this;
+        var _this6 = this;
 
         this.completedUl.innerHTML = "";
 
@@ -200,15 +237,15 @@ var view = {
             completedLi.id = "completed-" + position;
             completedLi.textContent = todo.todoTitle;
             todo.completed = !todo.completed;
-            var checkbox = _this5.createCheckBox();
+            var checkbox = _this6.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
 
-            var btnDiv = _this5.createBtnDiv();
-            btnDiv.appendChild(_this5.createDeleteIcon());
+            var btnDiv = _this6.createBtnDiv();
+            btnDiv.appendChild(_this6.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
-            _this5.completedUl.appendChild(completedLi);
+            _this6.completedUl.appendChild(completedLi);
         }, this);
     },
     createBtnDiv: function createBtnDiv() {
@@ -241,7 +278,7 @@ var view = {
         return priorityBtn;
     },
     setupEventListeners: function setupEventListeners() {
-        var _this6 = this;
+        var _this7 = this;
 
         var addTodoInputValue = document.querySelector("#addTodoValueInput");
         var toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
@@ -256,7 +293,7 @@ var view = {
         });
 
         toggleAllTodosBtn.addEventListener("click", function () {
-            _this6.todoUl.style.display = "";
+            _this7.todoUl.style.display = "";
             handlers.displayAllTodos();
         });
 
@@ -268,10 +305,10 @@ var view = {
         var filterPriorityTodos = function filterPriorityTodos() {
             var priorityTodoList = lists.filterPriorityTodos();
             if (priorityTodoList.length === 0) {
-                _this6.todoUl.classList.remove("priority-active");
+                _this7.todoUl.classList.remove("priority-active");
                 handlers.displayAllTodos();
             } else if (priorityTodoList.length > 0) {
-                _this6.todoUl.classList.add("priority-active");
+                _this7.todoUl.classList.add("priority-active");
                 handlers.filterPriorityTodos();
             }
         };
@@ -283,21 +320,21 @@ var view = {
             var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             var ul = "todoUl";
 
-            if (elementClicked.classList.contains("deleteBtn") && _this6.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.classList.contains("deleteBtn") && _this7.todoUl.classList.contains("priority-active")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
                 filterPriorityTodos();
             } else if (elementClicked.classList.contains("deleteBtn")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
-            if (elementClicked.checked && _this6.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.checked && _this7.todoUl.classList.contains("priority-active")) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
                 filterPriorityTodos();
             } else if (elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             }
 
-            if (elementClicked.classList.contains("priorityBtn") && _this6.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.classList.contains("priorityBtn") && _this7.todoUl.classList.contains("priority-active")) {
                 handlers.makeTodoPriority(elementParentIdValue);
                 filterPriorityTodos();
             } else if (elementClicked.classList.contains("priorityBtn")) {
@@ -320,5 +357,7 @@ var view = {
 };
 
 view.setupEventListeners();
+lists.retrieveTodosFromStorage();
+handlers.displayAllTodos();
 
 //# sourceMappingURL=app-compiled.js.map

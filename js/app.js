@@ -29,13 +29,47 @@ const lists = {
     completedTodos : [],
 
     // Create method to add todoItems to the list
-    addTodo (todoTitle, priority = false) {
+    addTodo (todoTitle, completed = false, priority = false) {
         this.todos.unshift({
             todoTitle : todoTitle,
-            completed : false,
+            completed : completed,
             priority  : priority,
         });
     },
+
+    storeTodosInLocalStorage() {
+        const storage = localStorage;
+            this.todos.forEach( (todo,position) => {
+                let todoObj = {
+                    title : todo.todoTitle,
+                    completed : todo.completed,
+                    priority  : todo.priority,
+                };
+                storage.setItem(position, JSON.stringify(todoObj));
+            })
+    },
+
+    retrieveTodosFromStorage(){
+        const storage = localStorage;
+
+        Object.keys(storage).forEach( key => {
+            let todo = JSON.parse(storage.getItem(key));
+            this.addTodo(todo.title,todo.completed,todo.priority);
+        });
+
+    },
+
+    //removeTodoFromStorage(position) {
+    //    const storage = localStorage;
+    //
+    //    Object.keys(storage).forEach( key => {
+    //        let keyToNumber = parseInt(key);
+    //        console.log(keyToNumber,position);
+    //        if(keyToNumber === position) {
+    //            storage.removeItem(keyToNumber);
+    //        }
+    //    })
+    //},
 
     deletedTodo (ul, position) {
         if(ul === "todoUl") {
@@ -58,7 +92,7 @@ const lists = {
             let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
             removeTodoFromCurrentPosition.forEach( todo => {
-                this.addTodo(todo.todoTitle, true);
+                this.addTodo(todo.todoTitle, todo.completed ,true);
             }, this);
         }
     },
@@ -105,6 +139,7 @@ const handlers = {
     addTodo(value) {
         lists.addTodo(value);
         view.displayTodos();
+        lists.storeTodosInLocalStorage();
     },
 
     deleteTodo(ul, position){
@@ -145,6 +180,11 @@ const handlers = {
     filterPriorityTodos(){
         view.displayPriorityTodos(lists.filterPriorityTodos());
     },
+
+    //removeTodoFromStorage(position) {
+    //    lists.removeTodoFromStorage(position)
+    //}
+
 };
 
 const view = {
@@ -327,4 +367,8 @@ const view = {
 };
 
 view.setupEventListeners();
+lists.retrieveTodosFromStorage();
+handlers.displayAllTodos();
+
+
 
