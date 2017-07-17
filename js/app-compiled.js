@@ -44,7 +44,7 @@ var lists = {
             _this.localStorageArr.push(todo);
         });
 
-        console.log(this.localStorageArr);
+        //console.log(this.localStorageArr);
     },
 
 
@@ -71,6 +71,7 @@ var lists = {
     },
     storeTodosInLocalStorage: function storeTodosInLocalStorage() {
         var storage = localStorage;
+
         this.localStorageArr.forEach(function (todo, position) {
 
             var todoObj = {
@@ -99,6 +100,17 @@ var lists = {
     removeTodoFromStorage: function removeTodoFromStorage(textValue) {
         var storage = localStorage;
 
+        if (Array.isArray(textValue)) {
+            textValue.forEach(function (todo) {
+                Object.keys(storage).forEach(function (key) {
+                    var title = JSON.parse(storage[key]).title;
+                    if (title === todo) {
+                        storage.removeItem(key);
+                    }
+                });
+            });
+        }
+
         Object.keys(storage).forEach(function (key) {
             var title = JSON.parse(storage[key]).title;
             if (title === textValue) {
@@ -114,7 +126,15 @@ var lists = {
         }
     },
     clearAllCompletedTodos: function clearAllCompletedTodos() {
+        var arr = [];
+
+        this.completedTodos.forEach(function (todo) {
+            arr.push(todo.todoTitle);
+        });
+
         this.completedTodos.splice(0);
+
+        return arr;
     },
     makeTodoPriority: function makeTodoPriority(position) {
         var _this3 = this;
@@ -209,7 +229,10 @@ var handlers = {
         view.displayCompletedTodos();
     },
     clearAllCompletedTodos: function clearAllCompletedTodos() {
-        lists.clearAllCompletedTodos();
+        lists.removeTodoFromStorage(lists.clearAllCompletedTodos());
+        lists.addAllTodosToLocalStorageArr();
+        view.displayTodos();
+        view.displayCompletedTodos();
     },
     filterPriorityTodos: function filterPriorityTodos() {
         view.displayPriorityTodos(lists.filterPriorityTodos());
@@ -340,7 +363,6 @@ var view = {
 
         clearCompletedTodos.addEventListener("click", function () {
             handlers.clearAllCompletedTodos();
-            handlers.displayAllTodos();
         });
 
         var filterPriorityTodos = function filterPriorityTodos() {

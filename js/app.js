@@ -40,7 +40,7 @@ const lists = {
             this.localStorageArr.push(todo);
         });
 
-        console.log(this.localStorageArr);
+        //console.log(this.localStorageArr);
     },
 
     // Create method to add todoItems to the list
@@ -62,6 +62,7 @@ const lists = {
 
     storeTodosInLocalStorage() {
         const storage = localStorage;
+
         this.localStorageArr.forEach( (todo,position) => {
 
             let todoObj = {
@@ -90,6 +91,17 @@ const lists = {
     removeTodoFromStorage(textValue) {
         const storage = localStorage;
 
+        if(Array.isArray(textValue)){
+            textValue.forEach(todo =>{
+                Object.keys(storage).forEach( key => {
+                    let title = JSON.parse(storage[key]).title;
+                    if(title === todo){
+                        storage.removeItem(key);
+                    }
+                })
+            })
+        }
+
         Object.keys(storage).forEach( key => {
             let title = JSON.parse(storage[key]).title;
             if(title === textValue){
@@ -107,7 +119,15 @@ const lists = {
     },
 
     clearAllCompletedTodos() {
+        let arr = [];
+
+        this.completedTodos.forEach( (todo) => {
+            arr.push(todo.todoTitle);
+        });
+
         this.completedTodos.splice(0);
+
+        return arr;
     },
 
     makeTodoPriority(position) {
@@ -207,7 +227,10 @@ const handlers = {
     },
 
     clearAllCompletedTodos(){
-      lists.clearAllCompletedTodos();
+        lists.removeTodoFromStorage(lists.clearAllCompletedTodos());
+        lists.addAllTodosToLocalStorageArr();
+        view.displayTodos();
+        view.displayCompletedTodos();
     },
 
     filterPriorityTodos(){
@@ -341,7 +364,6 @@ const view = {
 
         clearCompletedTodos.addEventListener("click", () => {
             handlers.clearAllCompletedTodos();
-            handlers.displayAllTodos();
         });
 
         let filterPriorityTodos = () => {
