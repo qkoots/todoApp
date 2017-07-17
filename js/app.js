@@ -27,9 +27,24 @@ const lists = {
     todos          : [],
     priorityTodos : [],
     completedTodos : [],
+    localStorageArr: [],
+
+    addAllTodosToLocalStorageArr() {
+        this.localStorageArr.splice(0);
+
+        this.todos.forEach( todo => {
+            this.localStorageArr.push(todo);
+        });
+
+        this.completedTodos.forEach( todo => {
+            this.localStorageArr.push(todo);
+        });
+
+        console.log(this.localStorageArr);
+    },
 
     // Create method to add todoItems to the list
-    addTodo (todoTitle, completed = false, priority = false) {
+    addTodo(todoTitle, completed = false, priority = false) {
         this.todos.unshift({
             todoTitle : todoTitle,
             completed : completed,
@@ -37,9 +52,18 @@ const lists = {
         });
     },
 
+    addCompletedTodo(todoTitle, completed = true, priority = false){
+        this.completedTodos.push({
+            todoTitle : todoTitle,
+            completed : completed,
+            priority  : priority,
+        })
+    },
+
     storeTodosInLocalStorage() {
         const storage = localStorage;
-        this.todos.forEach( (todo,position) => {
+        this.localStorageArr.forEach( (todo,position) => {
+
             let todoObj = {
                 title : todo.todoTitle,
                 completed : todo.completed,
@@ -54,9 +78,13 @@ const lists = {
 
         Object.keys(storage).forEach( key => {
             let todo = JSON.parse(storage.getItem(key));
-            this.addTodo(todo.title,todo.completed,todo.priority);
-        });
 
+            if(todo.completed === false) {
+                this.addTodo(todo.title, todo.completed, todo.priority);
+            } else {
+                this.addCompletedTodo(todo.title, todo.completed, todo.priority);
+            }
+        });
     },
 
     removeTodoFromStorage(textValue) {
@@ -70,7 +98,7 @@ const lists = {
         })
     },
 
-    deletedTodo (ul, position) {
+    deletedTodo(ul, position) {
         if(ul === "todoUl") {
             this.todos.splice(position, 1);
         } else {
@@ -82,7 +110,7 @@ const lists = {
         this.completedTodos.splice(0);
     },
 
-    makeTodoPriority (position) {
+    makeTodoPriority(position) {
         let todo = this.todos[position];
 
         if(todo.priority === true) {
@@ -97,24 +125,22 @@ const lists = {
     },
 
     // Create method to mark todoItems as completed in the list
-    toggleCompleted (position) {
+    toggleCompleted(position) {
         let todo       = this.todos[position];
-        todo.completed = !todo.completed;
 
         this.completedTodos.unshift({
             todoTitle : todo.todoTitle,
-            completed : todo.completed,
+            completed : !todo.completed,
             priority  : todo.priority
         });
     },
 
     toggleNotCompleted(position) {
         let todo       = this.completedTodos[position];
-        todo.completed = false;
 
         this.todos.push({
             todoTitle : todo.todoTitle,
-            completed : todo.completed,
+            completed : !todo.completed,
             priority  : todo.priority
         });
     },
@@ -137,26 +163,31 @@ const handlers = {
 
     addTodo(value) {
         lists.addTodo(value);
-        lists.storeTodosInLocalStorage();
         view.displayTodos();
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
     },
 
     deleteTodo(ul, position){
         lists.deletedTodo(ul, position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.addAllTodosToLocalStorageArr();
     },
 
     makeTodoPriority(position){
         lists.makeTodoPriority(position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.addAllTodosToLocalStorageArr();
         lists.storeTodosInLocalStorage();
     },
 
     toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -164,6 +195,8 @@ const handlers = {
     toggleNotCompleted(position) {
         lists.toggleNotCompleted(position);
         lists.deletedTodo(null, position);
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -215,11 +248,11 @@ const view = {
         }, this);
     },
 
-    displayPriorityTodos(priorityTodosList){
+    displayPriorityTodos(priorityTodosList) {
         this.todoUl.innerHTML = "";
         this.completedUl.style.display = "none";
 
-        priorityTodosList.forEach((todo, position) => {
+        priorityTodosList.forEach( (todo, position) => {
             let todoLi         = document.createElement("li");
             let textNode = document.createTextNode(todo.todoTitle);
             todoLi.id          = position;
@@ -239,9 +272,9 @@ const view = {
 
         lists.completedTodos.forEach( (todo, position) => {
             let completedLi         = document.createElement("li");
+            let textNode = document.createTextNode(todo.todoTitle);
             completedLi.id          = `completed-${position}`;
-            completedLi.textContent = todo.todoTitle;
-            todo.completed          = !todo.completed;
+            completedLi.appendChild(textNode);
             let checkbox = this.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
@@ -261,7 +294,7 @@ const view = {
     },
 
     createDeleteIcon() {
-        let deleteBtn         = document.createElement("i");
+        let deleteBtn = document.createElement("i");
         deleteBtn.classList.add("deleteBtn","fa", "fa-trash-o","fa-fw", "fa-2x");
         deleteBtn.setAttribute("aria-hidden","true");
         return deleteBtn;
@@ -275,14 +308,14 @@ const view = {
     },
 
     createPriorityInitialIcon() {
-        let priorityBtn         = document.createElement("i");
+        let priorityBtn = document.createElement("i");
         priorityBtn.classList.add("priorityBtn","fa","fa-star-o","fa-fw","fa-2x");
         priorityBtn.setAttribute("aria-hidden","true");
         return priorityBtn;
     },
 
     createPriorityIcon() {
-        let priorityBtn         = document.createElement("i");
+        let priorityBtn = document.createElement("i");
         priorityBtn.classList.add("priorityBtn","fa","fa-star","fa-fw","fa-2x");
         priorityBtn.setAttribute("aria-hidden","true");
         return priorityBtn;
@@ -361,6 +394,8 @@ const view = {
             let position       = elementClicked.parentNode.id.substr(10);
 
             if(elementClicked.classList.contains("deleteBtn")){
+                let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
+                handlers.removeTodoFromStorage(textValue);
                 handlers.deleteTodo(ul, position);
             } else if(!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);

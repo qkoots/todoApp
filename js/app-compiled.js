@@ -29,6 +29,24 @@ var lists = {
     todos: [],
     priorityTodos: [],
     completedTodos: [],
+    localStorageArr: [],
+
+    addAllTodosToLocalStorageArr: function addAllTodosToLocalStorageArr() {
+        var _this = this;
+
+        this.localStorageArr.splice(0);
+
+        this.todos.forEach(function (todo) {
+            _this.localStorageArr.push(todo);
+        });
+
+        this.completedTodos.forEach(function (todo) {
+            _this.localStorageArr.push(todo);
+        });
+
+        console.log(this.localStorageArr);
+    },
+
 
     // Create method to add todoItems to the list
     addTodo: function addTodo(todoTitle) {
@@ -41,9 +59,20 @@ var lists = {
             priority: priority
         });
     },
+    addCompletedTodo: function addCompletedTodo(todoTitle) {
+        var completed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        var priority = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        this.completedTodos.push({
+            todoTitle: todoTitle,
+            completed: completed,
+            priority: priority
+        });
+    },
     storeTodosInLocalStorage: function storeTodosInLocalStorage() {
         var storage = localStorage;
-        this.todos.forEach(function (todo, position) {
+        this.localStorageArr.forEach(function (todo, position) {
+
             var todoObj = {
                 title: todo.todoTitle,
                 completed: todo.completed,
@@ -53,13 +82,18 @@ var lists = {
         });
     },
     retrieveTodosFromStorage: function retrieveTodosFromStorage() {
-        var _this = this;
+        var _this2 = this;
 
         var storage = localStorage;
 
         Object.keys(storage).forEach(function (key) {
             var todo = JSON.parse(storage.getItem(key));
-            _this.addTodo(todo.title, todo.completed, todo.priority);
+
+            if (todo.completed === false) {
+                _this2.addTodo(todo.title, todo.completed, todo.priority);
+            } else {
+                _this2.addCompletedTodo(todo.title, todo.completed, todo.priority);
+            }
         });
     },
     removeTodoFromStorage: function removeTodoFromStorage(textValue) {
@@ -83,7 +117,7 @@ var lists = {
         this.completedTodos.splice(0);
     },
     makeTodoPriority: function makeTodoPriority(position) {
-        var _this2 = this;
+        var _this3 = this;
 
         var todo = this.todos[position];
 
@@ -93,7 +127,7 @@ var lists = {
             var removeTodoFromCurrentPosition = this.todos.splice(position, 1);
 
             removeTodoFromCurrentPosition.forEach(function (todo) {
-                _this2.addTodo(todo.todoTitle, todo.completed, true);
+                _this3.addTodo(todo.todoTitle, todo.completed, true);
             }, this);
         }
     },
@@ -102,30 +136,28 @@ var lists = {
     // Create method to mark todoItems as completed in the list
     toggleCompleted: function toggleCompleted(position) {
         var todo = this.todos[position];
-        todo.completed = !todo.completed;
 
         this.completedTodos.unshift({
             todoTitle: todo.todoTitle,
-            completed: todo.completed,
+            completed: !todo.completed,
             priority: todo.priority
         });
     },
     toggleNotCompleted: function toggleNotCompleted(position) {
         var todo = this.completedTodos[position];
-        todo.completed = false;
 
         this.todos.push({
             todoTitle: todo.todoTitle,
-            completed: todo.completed,
+            completed: !todo.completed,
             priority: todo.priority
         });
     },
     filterPriorityTodos: function filterPriorityTodos() {
-        var _this3 = this;
+        var _this4 = this;
 
         return this.todos.filter(function (todo) {
             if (todo.priority !== false) {
-                return _this3.priorityTodos.unshift({
+                return _this4.priorityTodos.unshift({
                     todoTitle: todo.todoTitle,
                     completed: todo.completed,
                     priority: todo.priority
@@ -139,29 +171,36 @@ var lists = {
 var handlers = {
     addTodo: function addTodo(value) {
         lists.addTodo(value);
-        lists.storeTodosInLocalStorage();
         view.displayTodos();
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
     },
     deleteTodo: function deleteTodo(ul, position) {
         lists.deletedTodo(ul, position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.addAllTodosToLocalStorageArr();
     },
     makeTodoPriority: function makeTodoPriority(position) {
         lists.makeTodoPriority(position);
         view.displayTodos();
         view.displayCompletedTodos();
+        lists.addAllTodosToLocalStorageArr();
         lists.storeTodosInLocalStorage();
     },
     toggleCompleted: function toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
     toggleNotCompleted: function toggleNotCompleted(position) {
         lists.toggleNotCompleted(position);
         lists.deletedTodo(null, position);
+        lists.addAllTodosToLocalStorageArr();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -185,7 +224,7 @@ var view = {
     completedUl: document.querySelector("#completedUl"),
 
     displayTodos: function displayTodos() {
-        var _this4 = this;
+        var _this5 = this;
 
         this.todoUl.innerHTML = "";
         this.completedUl.style.display = "";
@@ -195,22 +234,22 @@ var view = {
             var textNode = document.createTextNode(todo.todoTitle);
             todoLi.id = position;
             todoLi.appendChild(textNode);
-            todoLi.prepend(_this4.createCheckBox());
-            var btnDiv = _this4.createBtnDiv();
+            todoLi.prepend(_this5.createCheckBox());
+            var btnDiv = _this5.createBtnDiv();
 
             if (todo.priority === false) {
-                btnDiv.appendChild(_this4.createPriorityInitialIcon());
+                btnDiv.appendChild(_this5.createPriorityInitialIcon());
             } else {
-                btnDiv.appendChild(_this4.createPriorityIcon());
+                btnDiv.appendChild(_this5.createPriorityIcon());
             }
 
-            btnDiv.appendChild(_this4.createDeleteIcon());
+            btnDiv.appendChild(_this5.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this4.todoUl.appendChild(todoLi);
+            _this5.todoUl.appendChild(todoLi);
         }, this);
     },
     displayPriorityTodos: function displayPriorityTodos(priorityTodosList) {
-        var _this5 = this;
+        var _this6 = this;
 
         this.todoUl.innerHTML = "";
         this.completedUl.style.display = "none";
@@ -220,34 +259,34 @@ var view = {
             var textNode = document.createTextNode(todo.todoTitle);
             todoLi.id = position;
             todoLi.appendChild(textNode);
-            todoLi.prepend(_this5.createCheckBox());
-            var btnDiv = _this5.createBtnDiv();
+            todoLi.prepend(_this6.createCheckBox());
+            var btnDiv = _this6.createBtnDiv();
 
-            btnDiv.appendChild(_this5.createPriorityIcon());
-            btnDiv.appendChild(_this5.createDeleteIcon());
+            btnDiv.appendChild(_this6.createPriorityIcon());
+            btnDiv.appendChild(_this6.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this5.todoUl.appendChild(todoLi);
+            _this6.todoUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
-        var _this6 = this;
+        var _this7 = this;
 
         this.completedUl.innerHTML = "";
 
         lists.completedTodos.forEach(function (todo, position) {
             var completedLi = document.createElement("li");
+            var textNode = document.createTextNode(todo.todoTitle);
             completedLi.id = "completed-" + position;
-            completedLi.textContent = todo.todoTitle;
-            todo.completed = !todo.completed;
-            var checkbox = _this6.createCheckBox();
+            completedLi.appendChild(textNode);
+            var checkbox = _this7.createCheckBox();
             checkbox.checked = true;
             completedLi.prepend(checkbox);
 
-            var btnDiv = _this6.createBtnDiv();
-            btnDiv.appendChild(_this6.createDeleteIcon());
+            var btnDiv = _this7.createBtnDiv();
+            btnDiv.appendChild(_this7.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
-            _this6.completedUl.appendChild(completedLi);
+            _this7.completedUl.appendChild(completedLi);
         }, this);
     },
     createBtnDiv: function createBtnDiv() {
@@ -280,7 +319,7 @@ var view = {
         return priorityBtn;
     },
     setupEventListeners: function setupEventListeners() {
-        var _this7 = this;
+        var _this8 = this;
 
         var addTodoInputValue = document.querySelector("#addTodoValueInput");
         var toggleAllTodosBtn = document.querySelector(".toggleAllTodos");
@@ -295,7 +334,7 @@ var view = {
         });
 
         toggleAllTodosBtn.addEventListener("click", function () {
-            _this7.todoUl.style.display = "";
+            _this8.todoUl.style.display = "";
             handlers.displayAllTodos();
         });
 
@@ -307,10 +346,10 @@ var view = {
         var filterPriorityTodos = function filterPriorityTodos() {
             var priorityTodoList = lists.filterPriorityTodos();
             if (priorityTodoList.length === 0) {
-                _this7.todoUl.classList.remove("priority-active");
+                _this8.todoUl.classList.remove("priority-active");
                 handlers.displayAllTodos();
             } else if (priorityTodoList.length > 0) {
-                _this7.todoUl.classList.add("priority-active");
+                _this8.todoUl.classList.add("priority-active");
                 handlers.filterPriorityTodos();
             }
         };
@@ -322,7 +361,7 @@ var view = {
             var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             var ul = "todoUl";
 
-            if (elementClicked.classList.contains("deleteBtn") && _this7.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.classList.contains("deleteBtn") && _this8.todoUl.classList.contains("priority-active")) {
                 handlers.deleteTodo(ul, elementParentIdValue);
                 filterPriorityTodos();
             } else if (elementClicked.classList.contains("deleteBtn")) {
@@ -331,14 +370,14 @@ var view = {
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
-            if (elementClicked.checked && _this7.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.checked && _this8.todoUl.classList.contains("priority-active")) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
                 filterPriorityTodos();
             } else if (elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             }
 
-            if (elementClicked.classList.contains("priorityBtn") && _this7.todoUl.classList.contains("priority-active")) {
+            if (elementClicked.classList.contains("priorityBtn") && _this8.todoUl.classList.contains("priority-active")) {
                 handlers.makeTodoPriority(elementParentIdValue);
                 filterPriorityTodos();
             } else if (elementClicked.classList.contains("priorityBtn")) {
@@ -352,6 +391,8 @@ var view = {
             var position = elementClicked.parentNode.id.substr(10);
 
             if (elementClicked.classList.contains("deleteBtn")) {
+                var textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
+                handlers.removeTodoFromStorage(textValue);
                 handlers.deleteTodo(ul, position);
             } else if (!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
