@@ -278,7 +278,8 @@ var view = {
     displayTodos: function displayTodos() {
         var _this5 = this;
 
-        this.todoUl.innerHTML = "";
+        var todoUl = this.todoUl;
+        todoUl.innerHTML = "";
         this.completedUl.style.display = "";
 
         lists.todos.forEach(function (todo, position) {
@@ -297,13 +298,15 @@ var view = {
 
             btnDiv.appendChild(_this5.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this5.todoUl.appendChild(todoLi);
+            todoUl.appendChild(todoLi);
         }, this);
     },
     displayPriorityTodos: function displayPriorityTodos(priorityTodosList) {
         var _this6 = this;
 
-        this.todoUl.innerHTML = "";
+        var todoUl = this.todoUl;
+        todoUl.innerHTML = "";
+        todoUl.classList.add("priority-active");
         this.completedUl.style.display = "none";
 
         priorityTodosList.forEach(function (todo, position) {
@@ -317,13 +320,14 @@ var view = {
             btnDiv.appendChild(_this6.createPriorityIcon());
             btnDiv.appendChild(_this6.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            _this6.todoUl.appendChild(todoLi);
+            todoUl.appendChild(todoLi);
         }, this);
     },
     displayCompletedTodos: function displayCompletedTodos() {
         var _this7 = this;
 
-        this.completedUl.innerHTML = "";
+        var completedUl = this.completedUl;
+        completedUl.innerHTML = "";
 
         lists.completedTodos.forEach(function (todo, position) {
             var completedLi = document.createElement("li");
@@ -338,7 +342,7 @@ var view = {
             btnDiv.appendChild(_this7.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
-            _this7.completedUl.appendChild(completedLi);
+            completedUl.appendChild(completedLi);
         }, this);
     },
     createBtnDiv: function createBtnDiv() {
@@ -387,6 +391,7 @@ var view = {
 
         toggleAllTodosBtn.addEventListener("click", function () {
             _this8.todoUl.style.display = "";
+            _this8.todoUl.classList.remove("priority-active");
             handlers.displayAllTodos();
         });
 
@@ -410,18 +415,27 @@ var view = {
             var elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             var ul = "todoUl";
 
-            if (elementClicked.classList.contains("deleteBtn")) {
-                var textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
-                handlers.removeTodoFromLocalStorageObj(textValue);
-                handlers.deleteTodo(ul, elementParentIdValue);
-            }
-
-            if (elementClicked.checked) {
+            if (elementClicked.checked && _this8.todoUl.classList.contains("priority-active")) {
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+                filterPriorityTodos();
+            } else if (elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             }
 
-            if (elementClicked.classList.contains("priorityBtn")) {
+            if (elementClicked.classList.contains("priorityBtn") && _this8.todoUl.classList.contains("priority-active")) {
                 handlers.makeTodoPriority(elementParentIdValue);
+                filterPriorityTodos();
+            } else if (elementClicked.classList.contains("priorityBtn")) {
+                handlers.makeTodoPriority(elementParentIdValue);
+            }
+
+            if (elementClicked.classList.contains("deleteBtn") && _this8.todoUl.classList.contains("priority-active")) {
+                handlers.deleteTodo(ul, elementParentIdValue);
+                filterPriorityTodos();
+            } else if (elementClicked.classList.contains("deleteBtn")) {
+                var textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
+                handlers.removeTodoFromLocalStorageObj(textValue);
+                handlers.deleteTodo(ul, elementParentIdValue);
             }
         });
 

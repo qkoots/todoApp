@@ -257,7 +257,8 @@ const view = {
     completedUl : document.querySelector("#completedUl"),
 
     displayTodos() {
-        this.todoUl.innerHTML = "";
+        let todoUl = this.todoUl;
+        todoUl.innerHTML = "";
         this.completedUl.style.display = "";
 
         lists.todos.forEach((todo, position) => {
@@ -276,12 +277,14 @@ const view = {
 
             btnDiv.appendChild(this.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            this.todoUl.appendChild(todoLi);
+            todoUl.appendChild(todoLi);
         }, this);
     },
 
     displayPriorityTodos(priorityTodosList) {
-        this.todoUl.innerHTML = "";
+        let todoUl = this.todoUl;
+        todoUl.innerHTML = "";
+        todoUl.classList.add("priority-active");
         this.completedUl.style.display = "none";
 
         priorityTodosList.forEach( (todo, position) => {
@@ -295,12 +298,13 @@ const view = {
             btnDiv.appendChild(this.createPriorityIcon());
             btnDiv.appendChild(this.createDeleteIcon());
             todoLi.appendChild(btnDiv);
-            this.todoUl.appendChild(todoLi);
+            todoUl.appendChild(todoLi);
         }, this);
     },
 
     displayCompletedTodos() {
-        this.completedUl.innerHTML = "";
+        let completedUl = this.completedUl;
+        completedUl.innerHTML = "";
 
         lists.completedTodos.forEach( (todo, position) => {
             let completedLi         = document.createElement("li");
@@ -315,7 +319,7 @@ const view = {
             btnDiv.appendChild(this.createDeleteIcon());
 
             completedLi.appendChild(btnDiv);
-            this.completedUl.appendChild(completedLi);
+            completedUl.appendChild(completedLi);
         }, this);
     },
 
@@ -368,6 +372,7 @@ const view = {
 
         toggleAllTodosBtn.addEventListener("click", () => {
             this.todoUl.style.display = "";
+            this.todoUl.classList.remove("priority-active");
             handlers.displayAllTodos();
         });
 
@@ -391,20 +396,31 @@ const view = {
             let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             let ul                   = "todoUl";
 
-            if(elementClicked.classList.contains("deleteBtn")) {
+            if(elementClicked.checked && this.todoUl.classList.contains("priority-active")) {
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+                filterPriorityTodos();
+            } else if(elementClicked.checked) {
+                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
+            }
+
+            if(elementClicked.classList.contains("priorityBtn") && this.todoUl.classList.contains("priority-active")) {
+                handlers.makeTodoPriority(elementParentIdValue);
+                filterPriorityTodos();
+            } else if(elementClicked.classList.contains("priorityBtn")){
+                handlers.makeTodoPriority(elementParentIdValue);
+            }
+
+            if(elementClicked.classList.contains("deleteBtn") && this.todoUl.classList.contains("priority-active")) {
+                handlers.deleteTodo(ul, elementParentIdValue);
+                filterPriorityTodos();
+            }else if(elementClicked.classList.contains("deleteBtn")){
                 let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
                 handlers.removeTodoFromLocalStorageObj(textValue);
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
-
-            if(elementClicked.checked) {
-                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-            }
-
-            if(elementClicked.classList.contains("priorityBtn")){
-                handlers.makeTodoPriority(elementParentIdValue);
-            }
         });
+
+
 
         this.completedUl.addEventListener("click", event => {
             let elementClicked = event.target;
