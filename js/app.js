@@ -23,7 +23,31 @@
 // Construct the lists object
 const lists = {
 
-    // Array of items
+    // Init the app
+    appInit() {
+        view.setupEventListeners();
+        lists.retrieveTodosFromStorage();
+        handlers.displayAllTodos();
+    },
+
+    // This method checks the localStorage for stored todos and displays them when app is initiated.
+    retrieveTodosFromStorage(){
+        const storage = localStorage;
+
+        if(storage.length > 0) {
+            Object.keys(storage).forEach(key => {
+                let todo = JSON.parse(storage.getItem(key));
+
+                if(todo.completed === false) {
+                    this.addTodo(todo.title, todo.completed, todo.priority);
+                } else {
+                    this.addCompletedTodo(todo.title, todo.completed, todo.priority);
+                }
+            });
+        }
+    },
+
+    // Arrays
     todos          : [],
     priorityTodos : [],
     completedTodos : [],
@@ -41,6 +65,7 @@ const lists = {
         });
     },
 
+    // This method saves all the todos found in the storageArray into the Browsers localStorage Object.
     storeTodosInLocalStorage() {
         const storage = localStorage;
 
@@ -55,7 +80,7 @@ const lists = {
         })
     },
 
-    // Create method to add todoItems to the list
+    // Create method to add todos to the todos list.
     addTodo(todoTitle, completed = false, priority = false) {
         this.todos.unshift({
             todoTitle : todoTitle,
@@ -63,7 +88,7 @@ const lists = {
             priority  : priority,
         });
     },
-
+    // Method which add todos to the completed todos list.
     addCompletedTodo(todoTitle, completed = true, priority = false){
         this.completedTodos.push({
             todoTitle : todoTitle,
@@ -71,23 +96,9 @@ const lists = {
             priority  : priority,
         })
     },
-    
 
-    retrieveTodosFromStorage(){
-        const storage = localStorage;
-
-        Object.keys(storage).forEach( key => {
-            let todo = JSON.parse(storage.getItem(key));
-
-            if(todo.completed === false) {
-                this.addTodo(todo.title, todo.completed, todo.priority);
-            } else {
-                this.addCompletedTodo(todo.title, todo.completed, todo.priority);
-            }
-        });
-    },
-
-    removeTodoFromStorage(textValue) {
+    // Method which will remove the todos, passed as a parameter, from the localStorageObj.
+    removeTodoFromLocalStorageObj(textValue) {
         const storage = localStorage;
 
         if(Array.isArray(textValue)){
@@ -109,6 +120,18 @@ const lists = {
         }
     },
 
+    // This method return an array of all the todos in the completedTodos array. This array will be passed as parameter
+    // to the removeTodoFromLocalStorageObj to remove them from the Browsers localStorage Obj.
+    clearAllCompletedTodos() {
+        let arr = [];
+        this.completedTodos.forEach( (todo) => {
+            arr.push(todo.todoTitle);
+        });
+        this.completedTodos.splice(0);
+        return arr;
+    },
+
+    // Method which will delete todos from the todos or the completedTodos array.
     deletedTodo(ul, position) {
         if(ul === "todoUl") {
             this.todos.splice(position, 1);
@@ -117,18 +140,7 @@ const lists = {
         }
     },
 
-    clearAllCompletedTodos() {
-        let arr = [];
-
-        this.completedTodos.forEach( (todo) => {
-            arr.push(todo.todoTitle);
-        });
-
-        this.completedTodos.splice(0);
-
-        return arr;
-    },
-
+    // This method will change the todos priority status.
     makeTodoPriority(position) {
         let todo = this.todos[position];
 
@@ -154,6 +166,7 @@ const lists = {
         });
     },
 
+    // Create method to mark todos as NOTcompleted in the list.
     toggleNotCompleted(position) {
         let todo       = this.completedTodos[position];
 
@@ -164,6 +177,7 @@ const lists = {
         });
     },
 
+    // Checks the priority property of each todoItem and if value === true, those todos will be pushed to the priorityTodos aaray.
     filterPriorityTodos(){
        return this.todos.filter( todo => {
             if(todo.priority !== false) {
@@ -223,7 +237,7 @@ const handlers = {
     },
 
     clearAllCompletedTodos(){
-        lists.removeTodoFromStorage(lists.clearAllCompletedTodos());
+        lists.removeTodoFromLocalStorageObj(lists.clearAllCompletedTodos());
         lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
@@ -233,8 +247,8 @@ const handlers = {
         view.displayPriorityTodos(lists.filterPriorityTodos());
     },
 
-    removeTodoFromStorage(textValue) {
-        lists.removeTodoFromStorage(textValue);
+    removeTodoFromLocalStorageObj(textValue) {
+        lists.removeTodoFromLocalStorageObj(textValue);
     }
 };
 
@@ -379,7 +393,7 @@ const view = {
 
             if(elementClicked.classList.contains("deleteBtn")) {
                 let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
-                handlers.removeTodoFromStorage(textValue);
+                handlers.removeTodoFromLocalStorageObj(textValue);
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
@@ -399,7 +413,7 @@ const view = {
 
             if(elementClicked.classList.contains("deleteBtn")){
                 let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
-                handlers.removeTodoFromStorage(textValue);
+                handlers.removeTodoFromLocalStorageObj(textValue);
                 handlers.deleteTodo(ul, position);
             } else if(!elementClicked.checked) {
                 handlers.toggleNotCompleted(position);
@@ -408,6 +422,5 @@ const view = {
     }
 };
 
-view.setupEventListeners();
-lists.retrieveTodosFromStorage();
-handlers.displayAllTodos();
+// Run the app
+lists.appInit();
