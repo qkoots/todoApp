@@ -7,13 +7,13 @@
 // Option to clear all completed items.
 // Empty input form after items has been added.
 // Replace icons using font awesome icons.
+// Task in LocalStorage that has property of priority, should render as priority task when page is refresh/reload/visited again.
+// Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
 
 //TODO When app is init, focus must be on the input.
 //TODO integrate search method to search for specific items.
 //TODO Search should ignore case-sensitivity.
 //TODO Integrate Web Storage API to save data in the Storage object(localStorage).
-//TODO Task in LocalStorage that has the data-attr = priority, should render as priority task when page is refresh/reload/visited again.
-//TODO Task in LocalStorage that has already been completed should be rendered in the completedListUl when page is refresh/reload/visited again.
 //TODO Program should save the specific date a task was created.
 //TODO Program should save the specific date a task was completed.
 //TODO Users should be able to sort tasks alphabetically
@@ -27,20 +27,32 @@ const lists = {
     todos          : [],
     priorityTodos : [],
     completedTodos : [],
-    localStorageArr: [],
+    storageArray: [],
 
-    addAllTodosToLocalStorageArr() {
-        this.localStorageArr.splice(0);
+    pushAllTodosInStorageArray() {
+        this.storageArray.splice(0);
 
         this.todos.forEach( todo => {
-            this.localStorageArr.push(todo);
+            this.storageArray.push(todo);
         });
 
         this.completedTodos.forEach( todo => {
-            this.localStorageArr.push(todo);
+            this.storageArray.push(todo);
         });
+    },
 
-        //console.log(this.localStorageArr);
+    storeTodosInLocalStorage() {
+        const storage = localStorage;
+
+        this.storageArray.forEach( (todo,position) => {
+
+            let todoObj = {
+                title : todo.todoTitle,
+                completed : todo.completed,
+                priority  : todo.priority,
+            };
+            storage.setItem(position, JSON.stringify(todoObj));
+        })
     },
 
     // Create method to add todoItems to the list
@@ -59,20 +71,7 @@ const lists = {
             priority  : priority,
         })
     },
-
-    storeTodosInLocalStorage() {
-        const storage = localStorage;
-
-        this.localStorageArr.forEach( (todo,position) => {
-
-            let todoObj = {
-                title : todo.todoTitle,
-                completed : todo.completed,
-                priority  : todo.priority,
-            };
-            storage.setItem(position, JSON.stringify(todoObj));
-        })
-    },
+    
 
     retrieveTodosFromStorage(){
         const storage = localStorage;
@@ -100,14 +99,14 @@ const lists = {
                     }
                 })
             })
+        } else {
+            Object.keys(storage).forEach(key => {
+                let title = JSON.parse(storage[key]).title;
+                if(title === textValue) {
+                    storage.removeItem(key);
+                }
+            })
         }
-
-        Object.keys(storage).forEach( key => {
-            let title = JSON.parse(storage[key]).title;
-            if(title === textValue){
-                storage.removeItem(key);
-            }
-        })
     },
 
     deletedTodo(ul, position) {
@@ -136,10 +135,10 @@ const lists = {
         if(todo.priority === true) {
             todo.priority = !todo.priority;
         } else {
-            let removeTodoFromCurrentPosition = this.todos.splice(position, 1);
+            let removeTodoFromCurrentPosition = this.todos.splice(position, 1);     // Removes the todoItem from its current position in the todosArray.
 
             removeTodoFromCurrentPosition.forEach( todo => {
-                this.addTodo(todo.todoTitle, todo.completed ,true);
+                this.addTodo(todo.todoTitle, todo.completed ,true);                 // Insert the todoItem at the beginning of the todosArray by calling the addTodo method.
             }, this);
         }
     },
@@ -183,31 +182,29 @@ const handlers = {
 
     addTodo(value) {
         lists.addTodo(value);
-        view.displayTodos();
-        lists.addAllTodosToLocalStorageArr();
+        lists.pushAllTodosInStorageArray();
         lists.storeTodosInLocalStorage();
+        view.displayTodos();
     },
 
     deleteTodo(ul, position){
         lists.deletedTodo(ul, position);
+        lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
-        lists.addAllTodosToLocalStorageArr();
     },
 
     makeTodoPriority(position){
         lists.makeTodoPriority(position);
+        lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
-        lists.addAllTodosToLocalStorageArr();
-        lists.storeTodosInLocalStorage();
     },
 
     toggleCompleted(ul, position) {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
-        lists.addAllTodosToLocalStorageArr();
-        lists.storeTodosInLocalStorage();
+        lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -215,8 +212,7 @@ const handlers = {
     toggleNotCompleted(position) {
         lists.toggleNotCompleted(position);
         lists.deletedTodo(null, position);
-        lists.addAllTodosToLocalStorageArr();
-        lists.storeTodosInLocalStorage();
+        lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -228,7 +224,7 @@ const handlers = {
 
     clearAllCompletedTodos(){
         lists.removeTodoFromStorage(lists.clearAllCompletedTodos());
-        lists.addAllTodosToLocalStorageArr();
+        lists.pushAllTodosInStorageArray();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -240,7 +236,6 @@ const handlers = {
     removeTodoFromStorage(textValue) {
         lists.removeTodoFromStorage(textValue);
     }
-
 };
 
 const view = {
@@ -369,10 +364,8 @@ const view = {
         let filterPriorityTodos = () => {
             let priorityTodoList = lists.filterPriorityTodos();
             if(priorityTodoList.length === 0) {
-                this.todoUl.classList.remove("priority-active");
                 handlers.displayAllTodos();
             } else if (priorityTodoList.length > 0){
-                this.todoUl.classList.add("priority-active");
                 handlers.filterPriorityTodos();
             }
         };
@@ -384,28 +377,17 @@ const view = {
             let elementParentIdValue = parseInt(elementClicked.parentNode.parentNode.id);
             let ul                   = "todoUl";
 
-            if(elementClicked.classList.contains("deleteBtn") && this.todoUl.classList.contains("priority-active")) {
-                handlers.deleteTodo(ul, elementParentIdValue);
-                filterPriorityTodos();
-            } else if(elementClicked.classList.contains("deleteBtn")) {
+            if(elementClicked.classList.contains("deleteBtn")) {
                 let textValue = elementClicked.parentNode.parentNode.childNodes[1].textContent;
                 handlers.removeTodoFromStorage(textValue);
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
 
-            if(elementClicked.checked && this.todoUl.classList.contains("priority-active")) {
-                handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
-                filterPriorityTodos();
-
-            } else if(elementClicked.checked) {
+            if(elementClicked.checked) {
                 handlers.toggleCompleted(ul, parseInt(elementClicked.parentNode.id));
             }
 
-            if(elementClicked.classList.contains("priorityBtn") && this.todoUl.classList.contains("priority-active")) {
-                handlers.makeTodoPriority(elementParentIdValue);
-                filterPriorityTodos();
-
-            } else if(elementClicked.classList.contains("priorityBtn")){
+            if(elementClicked.classList.contains("priorityBtn")){
                 handlers.makeTodoPriority(elementParentIdValue);
             }
         });
