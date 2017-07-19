@@ -77,6 +77,7 @@ var lists = {
     // This method saves all the todos found in the storageArray into the Browsers localStorage Object.
     storeTodosInLocalStorage: function storeTodosInLocalStorage() {
         var storage = localStorage;
+        storage.clear();
 
         this.storageArray.forEach(function (todo, position) {
 
@@ -230,12 +231,14 @@ var handlers = {
     deleteTodo: function deleteTodo(ul, position) {
         lists.deletedTodo(ul, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
     makeTodoPriority: function makeTodoPriority(position) {
         lists.makeTodoPriority(position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -243,6 +246,7 @@ var handlers = {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -250,6 +254,7 @@ var handlers = {
         lists.toggleNotCompleted(position);
         lists.deletedTodo(null, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -260,6 +265,7 @@ var handlers = {
     clearAllCompletedTodos: function clearAllCompletedTodos() {
         lists.removeTodoFromLocalStorageObj(lists.clearAllCompletedTodos());
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -386,6 +392,7 @@ var view = {
             if (event.key === "Enter" && addTodoInputValue.value !== "") {
                 handlers.addTodo(addTodoInputValue.value);
                 addTodoInputValue.value = "";
+                _this8.todoUl.classList.remove("priority-active");
             }
         });
 
@@ -402,6 +409,7 @@ var view = {
         var filterPriorityTodos = function filterPriorityTodos() {
             var priorityTodoList = lists.filterPriorityTodos();
             if (priorityTodoList.length === 0) {
+                _this8.todoUl.classList.remove("priority-active");
                 handlers.displayAllTodos();
             } else if (priorityTodoList.length > 0) {
                 handlers.filterPriorityTodos();

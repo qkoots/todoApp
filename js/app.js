@@ -68,6 +68,7 @@ const lists = {
     // This method saves all the todos found in the storageArray into the Browsers localStorage Object.
     storeTodosInLocalStorage() {
         const storage = localStorage;
+        storage.clear();
 
         this.storageArray.forEach( (todo,position) => {
 
@@ -204,6 +205,7 @@ const handlers = {
     deleteTodo(ul, position){
         lists.deletedTodo(ul, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -211,6 +213,7 @@ const handlers = {
     makeTodoPriority(position){
         lists.makeTodoPriority(position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -219,6 +222,7 @@ const handlers = {
         lists.toggleCompleted(position);
         lists.deletedTodo(ul, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -227,6 +231,7 @@ const handlers = {
         lists.toggleNotCompleted(position);
         lists.deletedTodo(null, position);
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -239,6 +244,7 @@ const handlers = {
     clearAllCompletedTodos(){
         lists.removeTodoFromLocalStorageObj(lists.clearAllCompletedTodos());
         lists.pushAllTodosInStorageArray();
+        lists.storeTodosInLocalStorage();
         view.displayTodos();
         view.displayCompletedTodos();
     },
@@ -367,6 +373,7 @@ const view = {
             if(event.key === "Enter" && addTodoInputValue.value !== ""){
                 handlers.addTodo(addTodoInputValue.value);
                 addTodoInputValue.value = "";
+                this.todoUl.classList.remove("priority-active");
             }
         });
 
@@ -383,6 +390,7 @@ const view = {
         let filterPriorityTodos = () => {
             let priorityTodoList = lists.filterPriorityTodos();
             if(priorityTodoList.length === 0) {
+                this.todoUl.classList.remove("priority-active");
                 handlers.displayAllTodos();
             } else if (priorityTodoList.length > 0){
                 handlers.filterPriorityTodos();
@@ -419,8 +427,6 @@ const view = {
                 handlers.deleteTodo(ul, elementParentIdValue);
             }
         });
-
-
 
         this.completedUl.addEventListener("click", event => {
             let elementClicked = event.target;
