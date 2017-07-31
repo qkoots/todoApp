@@ -91,13 +91,16 @@ li {
     background-color: #94aa96;
     height: 40px;
 }
+
 .ui-btn {
 
 }
 
+.toggleAllTodos, .clearCompletedTodos, .togglePriorityTodos {
+    padding: .5em 1em;
+}
+
 
 @media (max-width: 575px) {
-    .col- {
-        display: none;
-    }
+
 }
